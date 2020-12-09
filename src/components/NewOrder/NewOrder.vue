@@ -6,6 +6,7 @@
         :data="modules.data"
         :columns="modules.columns"
         @addRow="addRow"
+        @changeModulesForm="changeModulesForm"
         @deleteRow="deleteRow" />
   </div>
 </template>
@@ -13,6 +14,8 @@
 <script>
 // @ is an alias to /src
 import ModulesForm from './ModulesForm.vue';
+import api from '../../service/api';
+
 // import MainForm from './MainForm.vue';
 const columns = [
   {
@@ -24,29 +27,34 @@ const columns = [
     title: 'Название блока',
     dataIndex: 'name',
     key: 'name',
+    scopedSlots: { customRender: 'name' },
   },
   {
     title: 'Типоисполнение',
     dataIndex: 'type',
     key: 'type',
+    scopedSlots: { customRender: 'type' },
   },
   {
     title: 'Логический номер',
     key: 'logicNumber',
     dataIndex: 'logicNumber',
+    scopedSlots: { customRender: 'logicNumber' },
   },
   {
     title: 'Размещение в корпусе',
     key: 'placed',
     dataIndex: 'placed',
+    scopedSlots: { customRender: 'placed' },
   },
   {
     title: 'Примечание',
     key: 'description',
     dataIndex: 'description',
+    scopedSlots: { customRender: 'description' },
   },
   {
-    title: 'Action',
+    title: 'Действия',
     dataIndex: 'operation',
     scopedSlots: { customRender: 'operation' },
   },
@@ -57,25 +65,28 @@ const data = [
     key: '1',
     number: '1',
     name: 'John Brown',
+    type: 'qwe',
     logicNumber: 'New York No. 1 Lake Park',
     placed: 'New York No. 1 Lake Park',
-    description: 'New York No. 1 Lake Park',
+    description: 'New York No. 1 Lake Park1',
   },
   {
     key: '2',
-    number: '1',
+    number: '2',
     name: 'John Brown1',
+    type: 'qwe',
     logicNumber: 'New York No. 1 Lake Park',
     placed: 'New York No. 1 Lake Park',
-    description: 'New York No. 1 Lake Park',
+    description: 'New York No. 1 Lake Park2',
   },
   {
     key: '3',
-    number: '1',
+    number: '3',
+    type: 'qwe',
     name: 'John Brown2',
     logicNumber: 'New York No. 1 Lake Park',
     placed: 'New York No. 1 Lake Park',
-    description: 'New York No. 1 Lake Park',
+    description: 'New York No. 1 Lake Park3',
   },
 ];
 export default {
@@ -103,7 +114,14 @@ export default {
         data,
         columns,
       },
+      formAnalogBlocksOptions: this.$form.createForm(this, { name: 'analog_blocks_options' }),
     };
+  },
+  mounted() {
+    console.log(123);
+    api.get('/modules').then((res) => {
+      console.log(res);
+    });
   },
   props: {
   },
@@ -113,15 +131,20 @@ export default {
       this.modules.data = [
         ...this.modules.data, {
           key: this.modules.data.length + 1,
-          name: 'Joe Black',
-          age: 32,
-          address: 'Sidney No. 1 Lake Park',
-          tags: ['cool', 'teacher'],
+          number: this.modules.data.length + 1,
+          name: '',
+          type: '',
+          logicNumber: '',
+          placed: '',
+          description: '',
         }];
     },
     deleteRow(key) {
       const dataSource = [...this.modules.data];
       this.modules.data = dataSource.filter((item) => item.key !== key);
+    },
+    changeModulesForm(currentData) {
+      this.data = currentData;
     },
   },
   components: {

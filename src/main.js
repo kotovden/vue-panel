@@ -8,6 +8,7 @@ import {
   Switch,
   Table,
   Popconfirm,
+  Form,
 } from 'ant-design-vue';
 import App from './App.vue';
 import router from './router';
@@ -18,6 +19,7 @@ import 'ant-design-vue/dist/antd.css';
 Vue.config.productionTip = false;
 Vue.use(DatePicker);
 Vue.use(FormModel);
+Vue.use(Form);
 Vue.use(Input);
 Vue.use(Select);
 Vue.use(Button);
