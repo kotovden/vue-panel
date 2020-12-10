@@ -10,7 +10,6 @@
     <router-view/>
   </div>
 </template>
-
 <style lang="scss">
 #app {
   font-family: Roboto, Avenir, Helvetica, Arial, sans-serif;

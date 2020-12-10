@@ -1,29 +1,38 @@
 <template>
-    <div class="modules-form">
+    <div class="analog-block-options">
        <h3>Конфигурация аналоговых блоков:</h3>
-        <a-table :pagination="false" :showHeader="false" :columns="columns" :data-source="data">
-            <template
-            v-for="col in ['mainBlock', 'name', 'type', 'logicNumber', 'placed', 'description']"
-            :slot="col" slot-scope="text, record, index">
-              <a-form-item :key="col">
-                <a-input :value="record[col]"
-                  @change="e => handleChange(e.target.value, record.key, index, col)"
-                    size="small" placeholder="xxx/xxx" />
-              </a-form-item>
-            </template>
-            <template slot="operation" slot-scope="text, record">
-                  <a-popconfirm
-                  v-if="data.length"
-                  title="Вы уверены?"
-                  @confirm="() => deleteRow(record.key)"
-                  >
-                      <a href="javascript:;">Удалить</a>
-                  </a-popconfirm>
-              </template>
-          </a-table>
-        <a-button type="primary" @click="addRow">
-            Добавить строку
-        </a-button>
+       <div class="v-flex-wrapper">
+        <div class="v-flex-row" :key="rowIndex" v-for="(row, rowIndex) in data">
+          <a-button v-if="rowIndex === 0"
+            class="add-col" type="primary" @click="addRow">
+              Добавить столбец
+          </a-button>
+          <a-button v-if="rowIndex !== 0"
+            class="remove-row" type="danger" @click="addRow">
+              Удалить строку
+          </a-button>
+          <div
+          :key="colIndex" v-for="(col, colIndex) in row">
+          <a-button v-if="rowIndex === 0 && colIndex !== 0"
+            class="remove-col" type="danger" @click="addRow">
+              Удалить столбец
+          </a-button>
+          <a-button v-if="rowIndex === data.length - 1 && colIndex === 0"
+            class="add-row" type="primary" @click="addRow">
+              Добавить строку
+          </a-button>
+          <span v-if="typeof col === 'string'">
+            {{col}}
+          </span>
+          <div class="sub-col-wrp" v-if="typeof col !== 'string'">
+            <div :key="subColIndex" v-for="(subCol, subColIndex) in col">
+              {{subCol}}
+            </div>
+          </div>
+          </div>
+        </div>
+       </div>
+
     </div>
 </template>
 
@@ -32,11 +41,17 @@ export default {
   name: 'MainForm',
   props: {
     data: Array,
-    columns: Array,
   },
   methods: {
     addRow() {
       this.$emit('addRow');
+    },
+    getClass(rowIndex, colIndex) {
+      let className = 'v-double';
+      if (rowIndex === 0 || colIndex === 0) {
+        className = 'v-single';
+      }
+      return className;
     },
     deleteRow(key) {
       this.$emit('deleteRow', key);
@@ -53,7 +68,70 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-.modules-form {
-    width: 100%;
+$border-color-analog: #ccc;
+.analog-block-options {
+  width: 100%;
+  .v-flex-wrapper {
+    margin: 40px 0 0 0;
+    display: inline-block;
+    border-bottom: 1px solid $border-color-analog;
+    border-right: 1px solid $border-color-analog;
+    .v-flex-row {
+      display: flex;
+      position: relative;
+      & > div {
+        width: 400px;
+      }
+      div {
+        width: 100%;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-left: solid 1px $border-color-analog;
+        border-top: solid 1px $border-color-analog;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        & .sub-col-wrp {
+          border: none;
+          display: flex;
+          align-items: center;
+        justify-content: center;
+          div {
+            border-top: none;
+            border-left: none;
+            border-right: solid 1px $border-color-analog;
+            &:last-child {
+              border: none;
+            }
+          }
+        }
+      }
+      & > div {
+        width: 400px;
+      }
+      .add-col{
+        position: absolute;
+        top:-40px;
+        right: -160px;
+        width: 150px;
+      }
+      .remove-col {
+        position: absolute;
+        top: -40px;
+      }
+      .add-row {
+        position: absolute;
+        bottom: -40px;
+      }
+      .remove-row{
+        position: absolute;
+        top:10px;
+        right: -160px;
+        width: 150px;
+      }
+    }
+  }
 }
 </style>

@@ -19,9 +19,8 @@
 // @ is an alias to /src
 // import MainForm from './MainForm.vue';
 // import ModulesForm from './ModulesForm.vue';
-import api from '../../service/api';
+// import api from '../../service/api';
 import AnalogBlocksOptions from './AnalogBlocksOptions.vue';
-
 
 const columns = [
   {
@@ -91,15 +90,19 @@ export default {
         columns,
       },
       analogBlocksOptions: {
-        data: [['Логический номер', '1'], ['A1', ['~1', '5/200']], {}, {}],
+        data: [
+          ['Логический номер', 'A1', 'A1'],
+          ['1', ['~l', '5/200'], ['~l', '5/200']],
+          ['1', ['~l', '5/200'], ['~l', '5/200', '123wqeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee']],
+        ],
       },
       formAnalogBlocksOptions: this.$form.createForm(this, { name: 'analog_blocks_options' }),
     };
   },
   mounted() {
-    api.get('/modules').then((res) => {
-      console.log(res);
-    });
+    // api.get('/modules').then((res) => {
+    //   console.log(res);
+    // });
   },
   props: {
   },
