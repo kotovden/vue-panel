@@ -9,6 +9,7 @@ import {
   Table,
   Popconfirm,
   Form,
+  List,
 } from 'ant-design-vue';
 import App from './App.vue';
 import router from './router';
@@ -26,6 +27,9 @@ Vue.use(Button);
 Vue.use(Switch);
 Vue.use(Table);
 Vue.use(Popconfirm);
+Vue.use(Input.TextArea);
+Vue.use(List);
+Vue.use(List.Item);
 
 new Vue({
   router,

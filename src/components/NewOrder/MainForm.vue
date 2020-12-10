@@ -56,14 +56,6 @@
             <a-form-model-item label="Терминал входит в состав шкафа:">
                 <a-switch size="small" v-model="form.isConsist" />
             </a-form-model-item>
-            <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
-                <a-button type="primary" @click="onSubmit">
-                    Create
-                </a-button>
-                <a-button style="margin-left: 10px;">
-                    Cancel
-                </a-button>
-            </a-form-model-item>
         </a-form-model>
     </div>
 </template>
@@ -75,11 +67,6 @@ export default {
     labelCol: Object,
     wrapperCol: Object,
     form: Object,
-  },
-  methods: {
-    onSubmit() {
-      console.log('submit!', this.form);
-    },
   },
 };
 </script>

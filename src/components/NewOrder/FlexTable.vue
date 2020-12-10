@@ -1,24 +1,24 @@
 <template>
-    <div class="analog-block-options">
-       <h3>Конфигурация аналоговых блоков:</h3>
+    <div class="flex-table">
+       <h3>{{title}}</h3>
        <div class="v-flex-wrapper">
         <div class="v-flex-row" :key="rowIndex" v-for="(row, rowIndex) in data">
-          <a-button v-if="rowIndex === 0"
-            class="add-col" type="primary" @click="addRow">
+          <a-button v-if="colsControls && rowIndex === 0"
+            class="add-col" type="primary" @click="() => $emit('add-col', type)">
               Добавить столбец
           </a-button>
-          <a-button v-if="rowIndex !== 0"
-            class="remove-row" type="danger" @click="addRow">
+          <a-button v-if="rowsControls && rowIndex !== 0"
+            class="remove-row" type="danger" @click="() => $emit('remove-row', rowIndex, type)">
               Удалить строку
           </a-button>
           <div
           :key="colIndex" v-for="(col, colIndex) in row">
-          <a-button v-if="rowIndex === 0 && colIndex !== 0"
-            class="remove-col" type="danger" @click="addRow">
+          <a-button v-if="colsControls && rowIndex === 0 && colIndex !== 0"
+            class="remove-col" type="danger" @click="() => $emit('remove-col', colIndex, type)">
               Удалить столбец
           </a-button>
-          <a-button v-if="rowIndex === data.length - 1 && colIndex === 0"
-            class="add-row" type="primary" @click="addRow">
+          <a-button v-if="rowsControls && rowIndex === data.length - 1 && colIndex === 0"
+            class="add-row" type="primary" @click="() => $emit('add-row', type)">
               Добавить строку
           </a-button>
           <span v-if="typeof col === 'string'">
@@ -38,14 +38,15 @@
 
 <script>
 export default {
-  name: 'MainForm',
+  name: 'FlexTable',
   props: {
     data: Array,
+    rowsControls: Boolean,
+    colsControls: Boolean,
+    title: String,
+    type: String,
   },
   methods: {
-    addRow() {
-      this.$emit('addRow');
-    },
     getClass(rowIndex, colIndex) {
       let className = 'v-double';
       if (rowIndex === 0 || colIndex === 0) {
@@ -69,8 +70,10 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 $border-color-analog: #ccc;
-.analog-block-options {
+$width-blocks: 200px;
+.flex-table {
   width: 100%;
+  margin: 0 0 80px 0;
   .v-flex-wrapper {
     margin: 40px 0 0 0;
     display: inline-block;
@@ -109,7 +112,7 @@ $border-color-analog: #ccc;
         }
       }
       & > div {
-        width: 400px;
+        width: $width-blocks;
       }
       .add-col{
         position: absolute;
@@ -124,6 +127,7 @@ $border-color-analog: #ccc;
       .add-row {
         position: absolute;
         bottom: -40px;
+        left: 0;
       }
       .remove-row{
         position: absolute;
