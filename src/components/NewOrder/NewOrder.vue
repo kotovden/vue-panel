@@ -1,22 +1,28 @@
 <template>
   <div class="new-order">
     <h3>Добавить новую заявку на изготовление устройства</h3>
-    <!-- <main-form :form="form" :labelCol="labelCol" :wrapperCol="wrapperCol" /> -->
+    <!-- <main-form :form="form" :labelCol="labelCol" :wrapperCol="wrapperCol" />
     <modules-form
         :data="modules.data"
         :columns="modules.columns"
-        @addRow="addRow"
+        @addRow="addRowModules"
         @changeModulesForm="changeModulesForm"
-        @deleteRow="deleteRow" />
+        @deleteRow="deleteRow" /> -->
+        <analog-blocks-options
+        :data="analogBlocksOptions.data"
+        @addRow="addRowAnalogBlocksOption"
+        @changeAnalogBlocksOptions="changeAnalogBlocksOptions" />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import ModulesForm from './ModulesForm.vue';
-import api from '../../service/api';
-
 // import MainForm from './MainForm.vue';
+// import ModulesForm from './ModulesForm.vue';
+import api from '../../service/api';
+import AnalogBlocksOptions from './AnalogBlocksOptions.vue';
+
+
 const columns = [
   {
     dataIndex: 'number',
@@ -59,36 +65,6 @@ const columns = [
     scopedSlots: { customRender: 'operation' },
   },
 ];
-
-const data = [
-  {
-    key: '1',
-    number: '1',
-    name: 'John Brown',
-    type: 'qwe',
-    logicNumber: 'New York No. 1 Lake Park',
-    placed: 'New York No. 1 Lake Park',
-    description: 'New York No. 1 Lake Park1',
-  },
-  {
-    key: '2',
-    number: '2',
-    name: 'John Brown1',
-    type: 'qwe',
-    logicNumber: 'New York No. 1 Lake Park',
-    placed: 'New York No. 1 Lake Park',
-    description: 'New York No. 1 Lake Park2',
-  },
-  {
-    key: '3',
-    number: '3',
-    type: 'qwe',
-    name: 'John Brown2',
-    logicNumber: 'New York No. 1 Lake Park',
-    placed: 'New York No. 1 Lake Park',
-    description: 'New York No. 1 Lake Park3',
-  },
-];
 export default {
   name: 'NewOrder',
   data() {
@@ -111,14 +87,16 @@ export default {
         isConsist: undefined,
       },
       modules: {
-        data,
+        data: [],
         columns,
+      },
+      analogBlocksOptions: {
+        data: [['Логический номер', '1'], ['A1', ['~1', '5/200']], {}, {}],
       },
       formAnalogBlocksOptions: this.$form.createForm(this, { name: 'analog_blocks_options' }),
     };
   },
   mounted() {
-    console.log(123);
     api.get('/modules').then((res) => {
       console.log(res);
     });
@@ -126,7 +104,20 @@ export default {
   props: {
   },
   methods: {
-    addRow() {
+    addRowModules() {
+      console.log('submit!', this.form);
+      this.modules.data = [
+        ...this.modules.data, {
+          key: this.modules.data.length + 1,
+          number: this.modules.data.length + 1,
+          name: '',
+          type: '',
+          logicNumber: '',
+          placed: '',
+          description: '',
+        }];
+    },
+    addRowAnalogBlocksOption() {
       console.log('submit!', this.form);
       this.modules.data = [
         ...this.modules.data, {
@@ -144,12 +135,16 @@ export default {
       this.modules.data = dataSource.filter((item) => item.key !== key);
     },
     changeModulesForm(currentData) {
-      this.data = currentData;
+      this.modules.data = currentData;
+    },
+    changeAnalogBlocksOptions(currentData) {
+      this.analogBlocksOptions = currentData;
     },
   },
   components: {
+    AnalogBlocksOptions,
     // MainForm,
-    ModulesForm,
+    // ModulesForm,
   },
 };
 </script>
