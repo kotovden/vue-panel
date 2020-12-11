@@ -17,9 +17,9 @@
             </a-form-model-item>
             <a-form-model-item label="Срок передачи для проверки:">
                 <a-date-picker
+                    :locale="locale"
                     v-model="form.date1"
                     size="small"
-                    show-time
                     type="date"
                     placeholder="Выберите дату"
                     style="width: 100%;"
@@ -27,9 +27,9 @@
             </a-form-model-item>
             <a-form-model-item label="Дата отправки:">
                 <a-date-picker
+                    :locale="locale"
                     v-model="form.date2"
                     size="small"
-                    show-time
                     type="date"
                     placeholder="Выберите дату"
                     style="width: 100%;"
@@ -61,8 +61,16 @@
 </template>
 
 <script>
+import locale from 'ant-design-vue/es/date-picker/locale/ru_RU';
+import moment from 'moment';
+import 'moment/locale/ru';
+
 export default {
   name: 'MainForm',
+  data: () => ({
+    locale,
+    moment,
+  }),
   props: {
     labelCol: Object,
     wrapperCol: Object,
