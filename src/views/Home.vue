@@ -1,18 +1,18 @@
 <template>
   <div class="home">
     <h1>Заявка на изготовление</h1>
-    <NewOrder />
+    <Order type="create" />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import NewOrder from '@/components/NewOrder/NewOrder.vue';
+import Order from '@/components/Order/Order.vue';
 
 export default {
   name: 'Home',
   components: {
-    NewOrder,
+    Order,
   },
 };
 </script>

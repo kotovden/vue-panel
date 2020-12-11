@@ -1,6 +1,6 @@
 <template>
   <div class="orders">
-    <a-table :columns="columns" :data-source="data">
+    <a-table :customRow="customRow" :columns="columns" :data-source="data">
       <span slot="action">
         <div class="actions">
         <a>Задача</a>
@@ -64,6 +64,18 @@ export default {
   methods: {
     deleteRow(key) {
       this.$emit('deleteRow', key);
+    },
+    customRow(record) {
+      return {
+        props: {
+
+        },
+        on: {
+          click: () => {
+            this.$router.push({ path: `/edit-order/${record.ID}` });
+          },
+        },
+      };
     },
   },
 };

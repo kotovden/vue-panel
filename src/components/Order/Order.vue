@@ -1,8 +1,9 @@
 <template>
   <div class="new-order">
-    <h3>Добавить новую заявку на изготовление устройства</h3>
+    <h3 v-if="type === 'create'">Добавить новую заявку на изготовление устройства</h3>
+    <h3 v-if="type === 'edit'">Редактировать заявку на изготовление устройства</h3>
     <div class="block-wrp">
-      <main-form :form="form" :labelCol="labelCol" :wrapperCol="wrapperCol" />
+      <main-form :form="order.form" :labelCol="labelCol" :wrapperCol="wrapperCol" />
     </div>
 
     <div class="block-wrp">
@@ -66,7 +67,7 @@
       </p>
     </div>
     <div class="block-wrp">
-      <a-button size="large" type="primary" @click="onSubmit">
+      <a-button size="large" type="primary" @click="createOrder">
           Создать заказ
       </a-button>
       <a-button disabled size="large" style="margin-left: 10px;">
@@ -78,9 +79,10 @@
 
 <script>
 // @ is an alias to /src
+import moment from 'moment';
 import MainForm from './MainForm.vue';
 import ModulesForm from './ModulesForm.vue';
-// import api from '../../service/api';
+import api from '../../service/api';
 import FlexTable from './FlexTable.vue';
 
 const columns = [
@@ -126,25 +128,15 @@ const columns = [
   },
 ];
 export default {
-  name: 'NewOrder',
+  name: 'Order',
   data() {
     return {
       labelCol: { span: 16 },
       wrapperCol: { span: 10 },
       form: {
-        orderNumber: '',
-        deviceType: '',
-        deviceName: '',
-        count: '',
-        checkDate: undefined,
-        deliveryDate: undefined,
-        workTemp: '',
-        auxiliaryVoltage: '',
-        discreteInputVoltage: '',
-        nameplateLabel: '',
-        terminalVendorCodes: '',
-        tabMode: '',
-        isConsist: undefined,
+        createDate: moment(new Date()),
+        ...this.order,
+        deviceName: 'none',
       },
       modules: {
         data: [],
@@ -177,6 +169,8 @@ export default {
     // });
   },
   props: {
+    type: String,
+    order: Object,
   },
   methods: {
     addRowModules() {
@@ -236,7 +230,79 @@ export default {
     changeFlexTable(currentData, type) {
       this[type] = currentData;
     },
-    onSubmit() {},
+    createOrder() {
+      const newOrderData = {
+        ...this.form,
+        terminalVendorCodes: [
+          'string',
+        ],
+        tabMode: 'string',
+        isConsist: true,
+        status: 'active',
+        bitrixTaskID: 'string',
+        bitrixCreatorID: 'string',
+        createDate: '2020-12-11T14:57:44.566Z',
+        modules: [
+          {
+            moduleID: 0,
+            moduleName: 'string',
+            rows: [
+              {
+                fieldID: 0,
+                fieldName: 'string',
+                value: 'string',
+              },
+            ],
+          },
+        ],
+        analogBlocksOptions: {
+          headers: [
+            {
+              label: 'string',
+              colspan: 0,
+            },
+          ],
+          rows: [
+            [
+              'string',
+            ],
+          ],
+        },
+        terminalBlocksLocation: {
+          headers: [
+            {
+              label: 'string',
+              colspan: 0,
+            },
+          ],
+          rows: [
+            [
+              'string',
+            ],
+          ],
+        },
+        options: {
+          headers: [
+            {
+              label: 'string',
+              colspan: 0,
+            },
+          ],
+          rows: [
+            [
+              'string',
+            ],
+          ],
+        },
+        note: 'string',
+      };
+      console.log(newOrderData);
+      api.post('/order', newOrderData).then((res) => {
+        console.log('res', res);
+      }).catch((err) => {
+        console.log('err', err);
+      });
+    },
   },
   components: {
     MainForm,

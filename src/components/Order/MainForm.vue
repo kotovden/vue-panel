@@ -10,7 +10,7 @@
                 <a-input size="small" placeholder="xxx/xxx" v-model="form.orderNumber" />
             </a-form-model-item>
             <a-form-model-item label="Тип устройства:">
-                <a-input size="small" v-model="form.type" />
+                <a-input size="small" v-model="form.deviceType" />
             </a-form-model-item>
             <a-form-model-item label="Количество:">
                 <a-input size="small" v-model="form.count" />
@@ -18,7 +18,8 @@
             <a-form-model-item label="Срок передачи для проверки:">
                 <a-date-picker
                     :locale="locale"
-                    v-model="form.date1"
+                    format="DD-MM-YYYY"
+                    v-model="form.checkDate"
                     size="small"
                     type="date"
                     placeholder="Выберите дату"
@@ -28,7 +29,8 @@
             <a-form-model-item label="Дата отправки:">
                 <a-date-picker
                     :locale="locale"
-                    v-model="form.date2"
+                    format="DD-MM-YYYY"
+                    v-model="form.deliveryDate"
                     size="small"
                     type="date"
                     placeholder="Выберите дату"
@@ -36,10 +38,10 @@
                 />
             </a-form-model-item>
             <a-form-model-item label="Напряжение оперативного питания, В:">
-                <a-input size="small" v-model="form.workTemp" />
+                <a-input size="small" v-model="form.auxiliaryVoltage" />
             </a-form-model-item>
             <a-form-model-item label="Рабочий диапазон температур, С:">
-                <a-input size="small" v-model="form.auxiliaryVoltage" />
+                <a-input size="small" v-model="form.workTemp" />
             </a-form-model-item>
             <a-form-model-item label="Напряжение дискретных входов, В:">
                 <a-input size="small" v-model="form.discreteInputVoltage" />

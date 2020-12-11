@@ -22,8 +22,13 @@ const routes = [
   },
   {
     path: '/orders-completed',
-    name: 'OrdersInWork',
+    name: 'OrdersCompleted',
     component: () => import(/* webpackChunkName: "about" */ '../views/OrdersCompleted.vue'),
+  },
+  {
+    path: '/edit-order/:id',
+    name: 'EditOrder',
+    component: () => import(/* webpackChunkName: "about" */ '../views/EditOrder.vue'),
   },
 ];
 
