@@ -20,6 +20,7 @@
         type="analogBlocksOptions"
         :data="analogBlocksOptions.data"
         :rowsControls="true"
+        :colsControls="true"
         @add-row="addRowFlexTable"
         @remove-row="removeRowFlexTable"
         @add-col="addColFlexTable"
@@ -194,7 +195,7 @@ export default {
       const currentData = [...this[type].data];
       const headers = currentData[0];
       const newRow = headers.map((item, index) => {
-        if (index > 0) {
+        if (index > 0 && type === 'analogBlocksOptions') {
           return ['', ''];
         }
         return '';
@@ -205,7 +206,7 @@ export default {
     addColFlexTable(type) {
       const currentData = [...this[type].data];
       currentData.forEach((row, rowIndex) => {
-        if (rowIndex > 0) {
+        if (rowIndex > 0 && type === 'analogBlocksOptions') {
           row.push(['', '']);
         } else {
           row.push('');

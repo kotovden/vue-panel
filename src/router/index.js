@@ -20,6 +20,11 @@ const routes = [
     name: 'OrdersInWork',
     component: () => import(/* webpackChunkName: "about" */ '../views/OrdersInWork.vue'),
   },
+  {
+    path: '/orders-completed',
+    name: 'OrdersInWork',
+    component: () => import(/* webpackChunkName: "about" */ '../views/OrdersCompleted.vue'),
+  },
 ];
 
 const router = new VueRouter({

@@ -1,59 +1,65 @@
 <template>
   <div class="orders">
     <a-table :columns="columns" :data-source="data">
-      <span slot="action" slot-scope="text, record">
-        <a>Invite 一 {{ record.name }}</a>
-        <a>Delete</a>
+      <span slot="action">
+        <div class="actions">
+        <a>Задача</a>
+        <a v-if="type === 'active'">Отменить изготовление</a>
+        </div>
       </span>
     </a-table>
-    {{JSON.stringify(data)}}
   </div>
 </template>
 
 <script>
-import api from '@/service/api';
 
-// const columns = [
-//   {
-//     dataIndex: 'name',
-//     key: 'name',
-//   },
-//   {
-//     title: 'Age',
-//     dataIndex: 'age',
-//     key: 'age',
-//   },
-//   {
-//     title: 'Address',
-//     dataIndex: 'address',
-//     key: 'address',
-//   },
-//   {
-//     title: 'Tags',
-//     key: 'tags',
-//     dataIndex: 'tags',
-//   },
-//   {
-//     title: 'Action',
-//     key: 'action',
-//     scopedSlots: { customRender: 'action' },
-//   },
-// ];
+const columns = [
+  {
+    title: 'Номер заказа',
+    dataIndex: 'orderNumber',
+    key: 'orderNumber',
+  },
+  {
+    title: 'Дата создания',
+    dataIndex: 'createDate',
+    key: 'createDate',
+  },
+  {
+    title: 'Дата проверки',
+    key: 'checkDate',
+    dataIndex: 'checkDate',
+  },
+  {
+    title: 'Тип устройства',
+    key: 'deviceType',
+    dataIndex: 'deviceType',
+  },
+  {
+    title: 'Кто создал',
+    key: 'bitrixCreatorID',
+    dataIndex: 'bitrixCreatorID',
+  },
+  {
+    title: 'Текущий этап',
+    key: 'wortTemp',
+    dataIndex: 'workTemp',
+  },
+  {
+    key: 'action',
+    scopedSlots: { customRender: 'action' },
+  },
+];
 
 export default {
   name: 'Orders',
   data() {
     return {
-      data: [],
+      columns,
     };
   },
-  mounted() {
-    api.get('/order').then((res) => {
-      console.log(res);
-      if (res && res.data) {
-        this.data = res.data.result;
-      }
-    });
+  props: {
+    data: Array,
+    type: String,
   },
   methods: {
     deleteRow(key) {
@@ -68,5 +74,10 @@ export default {
 .orders {
   width: 100%;
   text-align: left;
+  .actions {
+    a {
+      padding: 0 20px;
+    }
+  }
 }
 </style>
