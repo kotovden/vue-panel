@@ -3,7 +3,7 @@
     <h3 v-if="type === 'create'">Добавить новую заявку на изготовление устройства</h3>
     <h3 v-if="type === 'edit'">Редактировать заявку на изготовление устройства</h3>
     <div class="block-wrp">
-      <main-form :form="order.form" :labelCol="labelCol" :wrapperCol="wrapperCol" />
+      <main-form :form="form" :labelCol="labelCol" :wrapperCol="wrapperCol" />
     </div>
 
     <div class="block-wrp">
@@ -84,6 +84,7 @@ import MainForm from './MainForm.vue';
 import ModulesForm from './ModulesForm.vue';
 import api from '../../service/api';
 import FlexTable from './FlexTable.vue';
+import formFields from '../../map/map';
 
 const columns = [
   {
@@ -135,8 +136,19 @@ export default {
       wrapperCol: { span: 10 },
       form: {
         createDate: moment(new Date()),
-        ...this.order,
+        orderNumber: '',
+        deviceType: '',
         deviceName: 'none',
+        count: 9,
+        checkDate: undefined,
+        deliveryDate: undefined,
+        workTemp: '',
+        auxiliaryVoltage: '',
+        discreteInputVoltage: '',
+        nameplateLabel: '',
+        terminalVendorCodes: '',
+        tabMode: '',
+        isConsist: undefined,
       },
       modules: {
         data: [],
@@ -164,9 +176,29 @@ export default {
     };
   },
   mounted() {
-    // api.get('/modules').then((res) => {
-    //   console.log(res);
-    // });
+    if (this.type === 'edit') {
+      api.get(`/order?id=${this.$route.params.id}`).then((res) => {
+        console.log(res);
+        if (res && res.data) {
+          const { result } = res.data;
+          const order = result[0];
+          const resultOrder = {};
+          Object.keys(order).forEach((fieldName) => {
+            if (formFields.includes(fieldName)) {
+              resultOrder[fieldName] = result[0][fieldName];
+            }
+          });
+          const createDate = moment(order.createDate, null);
+          const deliveryDate = moment(order.deliveryDate, 'YYYY-MM-DD');
+          const checkDate = moment(order.checkDate, 'YYYY-MM-DD');
+          const terminalVendorCodes = order.terminalVendorCodes[0];
+          this.form = {
+            ...resultOrder, createDate, deliveryDate, checkDate, terminalVendorCodes,
+          };
+          console.log(this.order);
+        }
+      });
+    }
   },
   props: {
     type: String,
@@ -231,17 +263,22 @@ export default {
       this[type] = currentData;
     },
     createOrder() {
+      const createDate = moment(new Date());
+      const deliveryDate = moment(this.form.deliveryDate).format('YYYY-MM-DD');
+      const checkDate = moment(this.form.checkDate).format('YYYY-MM-DD');
+
       const newOrderData = {
         ...this.form,
+        createDate,
+        deliveryDate,
+        checkDate,
         terminalVendorCodes: [
           'string',
         ],
-        tabMode: 'string',
         isConsist: true,
         status: 'active',
         bitrixTaskID: 'string',
         bitrixCreatorID: 'string',
-        createDate: '2020-12-11T14:57:44.566Z',
         modules: [
           {
             moduleID: 0,
