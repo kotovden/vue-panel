@@ -6,13 +6,15 @@
       <main-form :form="form" :labelCol="labelCol" :wrapperCol="wrapperCol" />
     </div>
 
-    <div class="block-wrp">
+    <div v-for="module in modulesBlocks"
+        :key="module.id" class="block-wrp">
       <modules-form
-        :data="modules.data"
-        :columns="modules.columns"
+        :module="module"
+        :data="module.data"
+        :columns="module.columns"
         @addRow="addRowModules"
         @changeModulesForm="changeModulesForm"
-        @deleteRow="deleteRow" />
+        @deleteRow="deleteRowModules" />
     </div>
 
     <div class="block-wrp">
@@ -86,48 +88,6 @@ import api from '../../service/api';
 import FlexTable from './FlexTable.vue';
 import formFields from '../../map/map';
 
-const columns = [
-  {
-    dataIndex: 'number',
-    key: 'number',
-    title: '№',
-  },
-  {
-    title: 'Название блока',
-    dataIndex: 'name',
-    key: 'name',
-    scopedSlots: { customRender: 'name' },
-  },
-  {
-    title: 'Типоисполнение',
-    dataIndex: 'type',
-    key: 'type',
-    scopedSlots: { customRender: 'type' },
-  },
-  {
-    title: 'Логический номер',
-    key: 'logicNumber',
-    dataIndex: 'logicNumber',
-    scopedSlots: { customRender: 'logicNumber' },
-  },
-  {
-    title: 'Размещение в корпусе',
-    key: 'placed',
-    dataIndex: 'placed',
-    scopedSlots: { customRender: 'placed' },
-  },
-  {
-    title: 'Примечание',
-    key: 'description',
-    dataIndex: 'description',
-    scopedSlots: { customRender: 'description' },
-  },
-  {
-    title: 'Действия',
-    dataIndex: 'operation',
-    scopedSlots: { customRender: 'operation' },
-  },
-];
 export default {
   name: 'Order',
   data() {
@@ -139,7 +99,7 @@ export default {
         orderNumber: '',
         deviceType: '',
         deviceName: 'none',
-        count: 9,
+        count: undefined,
         checkDate: undefined,
         deliveryDate: undefined,
         workTemp: '',
@@ -152,8 +112,8 @@ export default {
       },
       modules: {
         data: [],
-        columns,
       },
+      modulesBlocks: [],
       analogBlocksOptions: {
         data: [
           ['Логический номер', 'A1'],
@@ -176,46 +136,98 @@ export default {
     };
   },
   mounted() {
+    const promiseModules = api.get('/modules');
+    const promises = [promiseModules];
     if (this.type === 'edit') {
-      api.get(`/order?id=${this.$route.params.id}`).then((res) => {
-        console.log(res);
-        if (res && res.data) {
-          const { result } = res.data;
-          const order = result[0];
-          const resultOrder = {};
-          Object.keys(order).forEach((fieldName) => {
-            if (formFields.includes(fieldName)) {
-              resultOrder[fieldName] = result[0][fieldName];
-            }
+      promises.push(api.get(`/order?id=${this.$route.params.id}`));
+    }
+    Promise.all(promises).then((values) => {
+      if (values && values.length) {
+        this.parseModulesBlockData(values[0]);
+        const promisesFields = this.modulesBlocks.map((module) => api.get(`/module/${module.ID}/fields`));
+        Promise.all(promisesFields).then((moduleFieldsValues) => {
+          moduleFieldsValues.forEach((res, index) => {
+            this.parseModulesBlockColumns(res, index);
           });
-          const createDate = moment(order.createDate, null);
-          const deliveryDate = moment(order.deliveryDate, 'YYYY-MM-DD');
-          const checkDate = moment(order.checkDate, 'YYYY-MM-DD');
-          const terminalVendorCodes = order.terminalVendorCodes[0];
-          this.form = {
-            ...resultOrder, createDate, deliveryDate, checkDate, terminalVendorCodes,
-          };
-          console.log(this.order);
+          console.log(moduleFieldsValues);
+        }).catch((err) => {
+          console.log(err);
+        });
+        if (this.type === 'edit') {
+          const editRes = values[values.length - 1];
+          if (editRes && editRes.data) {
+            const { result } = editRes.data;
+            const order = result[0];
+            const resultOrder = {};
+            Object.keys(order).forEach((fieldName) => {
+              if (formFields.includes(fieldName)) {
+                resultOrder[fieldName] = result[0][fieldName];
+              }
+            });
+            const createDate = moment(order.createDate, null);
+            const deliveryDate = moment(order.deliveryDate, 'YYYY-MM-DD');
+            const checkDate = moment(order.checkDate, 'YYYY-MM-DD');
+            const terminalVendorCodes = order.terminalVendorCodes[0];
+            this.form = {
+              ...resultOrder, createDate, deliveryDate, checkDate, terminalVendorCodes,
+            };
+            console.log(this.order);
+          }
         }
-      });
+      }
+    }).catch((err) => {
+      console.log(err);
+    });
+    if (this.type === 'edit') {
+      api.get(`/order?id=${this.$route.params.id}`).then();
     }
   },
   props: {
     type: String,
-    order: Object,
   },
   methods: {
-    addRowModules() {
-      this.modules.data = [
-        ...this.modules.data, {
-          key: this.modules.data.length + 1,
-          number: this.modules.data.length + 1,
-          name: '',
-          type: '',
-          logicNumber: '',
-          placed: '',
-          description: '',
+    getModuleById(id) {
+      return this.modulesBlocks.find((module) => module.ID === id);
+    },
+    getModuleArrayPositionById(id) {
+      return this.modulesBlocks.findIndex((module) => module.ID === id);
+    },
+    addRowModules(moduleId) {
+      const modulePosition = this.getModuleArrayPositionById(moduleId);
+      const modulesBlocks = [...this.modulesBlocks];
+      if (!modulesBlocks[modulePosition]) {
+        modulesBlocks[modulePosition] = {};
+      }
+
+      let oldData = [];
+      if (modulesBlocks[modulePosition].data) {
+        oldData = [...modulesBlocks[modulePosition].data];
+      }
+      let length = 0;
+      if (modulesBlocks[modulePosition]
+        && modulesBlocks[modulePosition].data
+        && modulesBlocks[modulePosition]
+          .data[modulesBlocks[modulePosition].data.length - 1]) {
+        length = modulesBlocks[modulePosition]
+          .data[modulesBlocks[modulePosition].data.length - 1].key;
+      }
+      modulesBlocks[modulePosition].data = [
+        ...oldData, {
+          key: length + 1,
+          1: '',
+          2: '',
+          3: '',
+          4: '',
+          5: '',
         }];
+      this.modulesBlocks = modulesBlocks;
+    },
+    deleteRowModules(moduleId, key) {
+      const modulePosition = this.getModuleArrayPositionById(moduleId);
+      const modulesBlocks = [...this.modulesBlocks];
+      const dataSource = [...modulesBlocks[modulePosition].data];
+      modulesBlocks[modulePosition].data = dataSource.filter((item) => item.key !== key);
+      this.modulesBlocks = modulesBlocks;
     },
     addRowFlexTable(type) {
       const currentData = [...this[type].data];
@@ -252,23 +264,62 @@ export default {
       currentData.splice(rowIndex, 1);
       this[type].data = currentData;
     },
-    deleteRow(key) {
-      const dataSource = [...this.modules.data];
-      this.modules.data = dataSource.filter((item) => item.key !== key);
-    },
-    changeModulesForm(currentData) {
-      this.modules.data = currentData;
+    changeModulesForm(currentData, moduleId) {
+      const modulePosition = this.getModuleArrayPositionById(moduleId);
+      const modulesBlocks = [...this.modulesBlocks];
+      modulesBlocks[modulePosition].data = currentData;
+      this.modulesBlocks = modulesBlocks;
     },
     changeFlexTable(currentData, type) {
       this[type] = currentData;
+    },
+    parseModulesBlockData(res) {
+      if (res && res.data) {
+        let modulesBlocks = res.data.result;
+        modulesBlocks = modulesBlocks.sort((a, b) => {
+          if (a.position && !b.position) {
+            return -1;
+          }
+          return a.position - b.position;
+        });
+        this.modulesBlocks = modulesBlocks;
+      }
+    },
+    parseModulesBlockColumns(res, resIndex) {
+      if (res && res.data) {
+        const moduleColumns = res.data.result.sort((a, b) => a.ID - b.ID).map((item, index) => {
+          let width = null;
+          if (index === 0) {
+            width = 80;
+          }
+          return {
+            width,
+            title: item.name,
+            key: item.ID,
+            dataIndex: item.ID,
+            scopedSlots: { customRender: `${item.ID}` },
+            isEditable: !!item.isEditable,
+          };
+        });
+        moduleColumns.push({
+          title: 'Действия',
+          dataIndex: 'operation',
+          scopedSlots: { customRender: 'operation' },
+        });
+        const modulesBlocks = [...this.modulesBlocks];
+        modulesBlocks[resIndex].columns = moduleColumns;
+        this.modulesBlocks = modulesBlocks;
+      }
     },
     createOrder() {
       const createDate = moment(new Date());
       const deliveryDate = moment(this.form.deliveryDate).format('YYYY-MM-DD');
       const checkDate = moment(this.form.checkDate).format('YYYY-MM-DD');
+      const count = +this.form.count;
 
       const newOrderData = {
         ...this.form,
+        count,
         createDate,
         deliveryDate,
         checkDate,
@@ -333,7 +384,6 @@ export default {
         },
         note: 'string',
       };
-      console.log(newOrderData);
       api.post('/order', newOrderData).then((res) => {
         console.log('res', res);
       }).catch((err) => {

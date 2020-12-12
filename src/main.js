@@ -30,6 +30,7 @@ Vue.use(Popconfirm);
 Vue.use(Input.TextArea);
 Vue.use(List);
 Vue.use(List.Item);
+Vue.use(Select.Option);
 
 new Vue({
   router,
