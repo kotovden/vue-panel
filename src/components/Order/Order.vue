@@ -94,8 +94,8 @@ export default {
     return {
       labelCol: { span: 16 },
       wrapperCol: { span: 10 },
+      createDate: moment(new Date()),
       form: {
-        createDate: moment(new Date()),
         orderNumber: '',
         deviceType: '',
         deviceName: 'none',
@@ -106,7 +106,7 @@ export default {
         auxiliaryVoltage: '',
         discreteInputVoltage: '',
         nameplateLabel: '',
-        terminalVendorCodes: '',
+        terminalVendorCodes: [],
         tabMode: '',
         isConsist: undefined,
       },
@@ -164,14 +164,15 @@ export default {
                 resultOrder[fieldName] = result[0][fieldName];
               }
             });
-            const createDate = moment(order.createDate, null);
-            const deliveryDate = moment(order.deliveryDate, 'YYYY-MM-DD');
-            const checkDate = moment(order.checkDate, 'YYYY-MM-DD');
-            const terminalVendorCodes = order.terminalVendorCodes[0];
-            this.form = {
-              ...resultOrder, createDate, deliveryDate, checkDate, terminalVendorCodes,
-            };
-            console.log(this.order);
+            if (order.form) {
+              const createDate = moment(order.createDate, null);
+              const deliveryDate = moment(order.form.deliveryDate, 'YYYY-MM-DD');
+              const checkDate = moment(order.form.checkDate, 'YYYY-MM-DD');
+              this.form = {
+                ...order.form, createDate, deliveryDate, checkDate,
+              };
+            }
+            console.log(this.form);
           }
         }
       }
@@ -318,14 +319,13 @@ export default {
       const count = +this.form.count;
 
       const newOrderData = {
-        ...this.form,
-        count,
+        form: {
+          ...this.form,
+          deliveryDate,
+          checkDate,
+          count,
+        },
         createDate,
-        deliveryDate,
-        checkDate,
-        terminalVendorCodes: [
-          'string',
-        ],
         isConsist: true,
         status: 'active',
         bitrixTaskID: 'string',

@@ -25,11 +25,12 @@ export default {
         const currentResult = [];
         result.forEach((order) => {
           const createDate = moment(order.createDate).format('DD.MM.YYYY');
-          const checkDate = moment(order.checkDate, 'YYYY-MM-DD').format('DD.MM.YYYY');
+          const checkDate = moment(order.form.checkDate, 'YYYY-MM-DD').format('DD.MM.YYYY');
           currentResult.push({
-            ...order,
+            ...order.form,
             createDate,
             key: order.ID,
+            ID: order.ID,
             checkDate,
           });
         });

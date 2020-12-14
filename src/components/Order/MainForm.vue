@@ -50,7 +50,8 @@
                 <a-input size="small" v-model="form.nameplateLabel" />
             </a-form-model-item>
             <a-form-model-item label="Заводской номер терминала:">
-                <a-input size="small" v-model="form.terminalVendorCodes" />
+                <a-select mode="tags" v-model="form.terminalVendorCodes" style="width: 100%">
+                </a-select>
             </a-form-model-item>
             <a-form-model-item label="Модификация вкладок:">
                 <a-input size="small" v-model="form.tabMode" />
