@@ -21,12 +21,15 @@
             class="add-row" type="primary" @click="() => $emit('add-row', type)">
               Добавить строку
           </a-button>
-          <span v-if="typeof col === 'string'">
-            {{col}}
-          </span>
+          <a-input v-if="typeof col === 'string'" :value="col"
+                  @change="e => handleChange(e.target.value, rowIndex, colIndex, col, type)"
+                    size="large" />
           <div class="sub-col-wrp" v-if="typeof col !== 'string'">
             <div :key="subColIndex" v-for="(subCol, subColIndex) in col">
-              {{subCol}}
+              <a-input :value="subCol"
+                @change="e =>
+                  handleChange(e.target.value, rowIndex, colIndex, col, type, subColIndex)"
+                    size="large" />
             </div>
           </div>
           </div>
@@ -57,11 +60,8 @@ export default {
     deleteRow(key) {
       this.$emit('deleteRow', key);
     },
-    handleChange(value, key, index, col) {
-      console.log(value, key, col, index, this.data);
-      const currentData = [...this.data];
-      currentData[index][col] = value;
-      this.$emit('changeModulesForm', currentData);
+    handleChange(value, rowIndex, colIndex, col, type, subColIndex) {
+      this.$emit('changeFlexTable', value, rowIndex, colIndex, col, type, subColIndex);
     },
   },
 };

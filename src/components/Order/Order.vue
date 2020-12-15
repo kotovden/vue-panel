@@ -21,7 +21,7 @@
       <flex-table
         title="Конфигурация аналоговых блоков:"
         type="analogBlocksOptions"
-        :data="analogBlocksOptions.data"
+        :data="analogBlocksOptions.rows"
         :rowsControls="true"
         :colsControls="true"
         @add-row="addRowFlexTable"
@@ -33,8 +33,8 @@
     <div class="block-wrp">
       <flex-table
         title="Расположение блоков в терминале:"
-        type="terminalBlocks"
-        :data="terminalBlocks.data"
+        type="terminalBlocksLocation"
+        :data="terminalBlocksLocation.rows"
         :rowsControls="false"
         :colsControls="true"
         @add-row="addRowFlexTable"
@@ -47,7 +47,7 @@
       <flex-table
         title="Опции:"
         type="options"
-        :data="options.data"
+        :data="options.rows"
         :rowsControls="true"
         :colsControls="false"
         @add-row="addRowFlexTable"
@@ -59,12 +59,12 @@
     <div class="block-wrp">
       <h3>Дополнительные требования и замечания:</h3>
       <div class="description">
-        <a-textarea :rows="12" />
+        <a-textarea v-model="note" :rows="12" />
       </div>
     </div>
     <div class="block-wrp">
       <p>
-        Дата заказа: 01.01.2021 <br />
+        Дата заказа: {{createDate.format('DD.MM.YYYY')}} <br />
         Заказ от Иванова И.И.
       </p>
     </div>
@@ -115,24 +115,23 @@ export default {
       },
       modulesBlocks: [],
       analogBlocksOptions: {
-        data: [
+        rows: [
           ['Логический номер', 'A1'],
-          ['1', ['~l', '5/200']],
+          [['1'], ['', '']],
         ],
       },
-      terminalBlocks: {
-        data: [
-          ['Логический номер', 'A1'],
-          ['1', '~l'],
+      terminalBlocksLocation: {
+        rows: [
+          [['Логический номер'], ['A1']],
+          [['1'], ['~l']],
         ],
       },
       options: {
-        data: [
-          ['', ''],
-          ['', ''],
+        rows: [
+          [[''], ['']],
         ],
       },
-      formAnalogBlocksOptions: this.$form.createForm(this, { name: 'analog_blocks_options' }),
+      note: '',
     };
   },
   mounted() {
@@ -171,8 +170,11 @@ export default {
               this.form = {
                 ...order.form, createDate, deliveryDate, checkDate,
               };
+              this.analogBlocksOptions = { ...order.analogBlocksOptions };
+              this.terminalBlocksLocation = { ...order.terminalBlocksLocation };
+              this.options = { ...order.options };
+              this.note = order.note;
             }
-            console.log(this.form);
           }
         }
       }
@@ -231,19 +233,19 @@ export default {
       this.modulesBlocks = modulesBlocks;
     },
     addRowFlexTable(type) {
-      const currentData = [...this[type].data];
+      const currentData = [...this[type].rows];
       const headers = currentData[0];
       const newRow = headers.map((item, index) => {
         if (index > 0 && type === 'analogBlocksOptions') {
           return ['', ''];
         }
-        return '';
+        return [''];
       });
       currentData.push(newRow);
-      this[type].data = currentData;
+      this[type].rows = currentData;
     },
     addColFlexTable(type) {
-      const currentData = [...this[type].data];
+      const currentData = [...this[type].rows];
       currentData.forEach((row, rowIndex) => {
         if (rowIndex > 0 && type === 'analogBlocksOptions') {
           row.push(['', '']);
@@ -251,19 +253,19 @@ export default {
           row.push('');
         }
       });
-      this[type].data = currentData;
+      this[type].rows = currentData;
     },
     removeColFlexTable(colIndex, type) {
-      const currentData = [...this[type].data];
+      const currentData = [...this[type].rows];
       currentData.forEach((row) => {
         row.splice(colIndex, 1);
       });
-      this[type].data = currentData;
+      this[type].rows = currentData;
     },
     removeRowFlexTable(rowIndex, type) {
-      const currentData = [...this[type].data];
+      const currentData = [...this[type].rows];
       currentData.splice(rowIndex, 1);
-      this[type].data = currentData;
+      this[type].rows = currentData;
     },
     changeModulesForm(currentData, moduleId) {
       const modulePosition = this.getModuleArrayPositionById(moduleId);
@@ -271,8 +273,16 @@ export default {
       modulesBlocks[modulePosition].data = currentData;
       this.modulesBlocks = modulesBlocks;
     },
-    changeFlexTable(currentData, type) {
-      this[type] = currentData;
+    changeFlexTable(value, rowIndex, colIndex, col, type, subColIndex) {
+      const currentData = [...this[type].rows];
+      if (subColIndex !== undefined && subColIndex !== null) {
+        currentData[rowIndex][colIndex][subColIndex] = value;
+        currentData[rowIndex][colIndex][subColIndex] = value;
+      } else {
+        currentData[rowIndex][colIndex] = value;
+        currentData[rowIndex][colIndex] = value;
+      }
+      this[type].rows = currentData;
     },
     parseModulesBlockData(res) {
       if (res && res.data) {
@@ -330,6 +340,7 @@ export default {
         status: 'active',
         bitrixTaskID: 'string',
         bitrixCreatorID: 'string',
+        note: this.note,
         modules: [
           {
             moduleID: 0,
@@ -344,45 +355,14 @@ export default {
           },
         ],
         analogBlocksOptions: {
-          headers: [
-            {
-              label: 'string',
-              colspan: 0,
-            },
-          ],
-          rows: [
-            [
-              'string',
-            ],
-          ],
+          rows: this.analogBlocksOptions.rows,
         },
         terminalBlocksLocation: {
-          headers: [
-            {
-              label: 'string',
-              colspan: 0,
-            },
-          ],
-          rows: [
-            [
-              'string',
-            ],
-          ],
+          rows: this.terminalBlocksLocation.rows,
         },
         options: {
-          headers: [
-            {
-              label: 'string',
-              colspan: 0,
-            },
-          ],
-          rows: [
-            [
-              'string',
-            ],
-          ],
+          rows: this.options.rows,
         },
-        note: 'string',
       };
       api.post('/order', newOrderData).then((res) => {
         console.log('res', res);
