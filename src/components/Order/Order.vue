@@ -69,16 +69,16 @@
       </p>
     </div>
     <div class="block-wrp">
-      <a-input style="width: 200px;"
-        size="large" v-model="templateName" placeholder="Имя шаблона" />
-              <a-button  style="margin-left: 10px;" size="large" @click="createOrderTemplate">
-          Сохранить как шаблон
-      </a-button>
-    </div>
-    <div class="block-wrp">
       <a-button size="large" type="primary" @click="createOrder">
           Создать заказ
       </a-button>
+    </div>
+    <div class="block-wrp">
+      <a-button  style="margin-right: 10px;" size="large" @click="createOrderTemplate">
+          Сохранить как шаблон
+      </a-button>
+      <a-input style="width: 200px;"
+        size="large" v-model="templateName" placeholder="Имя шаблона" />
     </div>
   </div>
 </template>
@@ -402,6 +402,7 @@ export default {
     createOrder() {
       api.post('/order', this.getOrderModel()).then((res) => {
         console.log('resOrder', res);
+        this.$router.push({ path: '/orders-in-work' });
       }).catch((err) => {
         console.log('err', err);
       });
@@ -416,6 +417,7 @@ export default {
       };
       api.post('/orderTemplate', orderTemplate).then((res) => {
         console.log('resOrderTemplate', res);
+        this.$router.push({ path: '/templates' });
       }).catch((err) => {
         console.log('err', err);
       });
