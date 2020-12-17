@@ -73,12 +73,21 @@
           Создать заказ
       </a-button>
     </div>
-    <div class="block-wrp">
+    <div style="display: flex;" class="block-wrp">
       <a-button  style="margin-right: 10px;" size="large" @click="createOrderTemplate">
           Сохранить как шаблон
       </a-button>
-      <a-input style="width: 200px;"
-        size="large" v-model="templateName" placeholder="Имя шаблона" />
+      <div style="position: relative;">
+        <label class="template-danger-label"
+          v-if="visibleTemplateNameError">
+          {{visibleTemplateNameError}}
+        </label>
+        <a-input
+          @change="changetemplateName"
+          :class="visibleTemplateNameError ? 'template-danger' : ''"
+          v-if="visibleTemplateName" style="width: 200px;"
+          size="large" v-model="templateName" placeholder="Имя шаблона" />
+      </div>
     </div>
   </div>
 </template>
@@ -96,6 +105,8 @@ export default {
   name: 'Order',
   data() {
     return {
+      visibleTemplateNameError: null,
+      visibleTemplateName: false,
       labelCol: { span: 16 },
       wrapperCol: { span: 10 },
       createDate: moment(new Date()),
@@ -197,6 +208,13 @@ export default {
     type: String,
   },
   methods: {
+    changetemplateName(e) {
+      if (e && e.target && e.target.value.trim() !== 0) {
+        this.visibleTemplateNameError = null;
+      } else {
+        this.visibleTemplateNameError = 'Заполните имя шаблона';
+      }
+    },
     parseAndFillOrder(order) {
       const resultOrder = {};
       Object.keys(order).forEach((fieldName) => {
@@ -327,6 +345,12 @@ export default {
           return a.position - b.position;
         });
         this.modulesBlocks = modulesBlocks;
+        modulesBlocks.forEach((item) => {
+          console.log(item);
+          if (item && item.allowNewLine) {
+            this.addRowModules(item.ID);
+          }
+        });
       }
     },
     parseModulesBlockColumns(res, resIndex) {
@@ -408,19 +432,27 @@ export default {
       });
     },
     createOrderTemplate() {
-      const order = this.getOrderModel();
-      const orderTemplate = {
-        order,
-        createDate: order.createDate,
-        bitrixCreatorID: order.bitrixCreatorID,
-        name: this.templateName,
-      };
-      api.post('/orderTemplate', orderTemplate).then((res) => {
-        console.log('resOrderTemplate', res);
-        this.$router.push({ path: '/templates' });
-      }).catch((err) => {
-        console.log('err', err);
-      });
+      if (this.visibleTemplateName) {
+        if (this.templateName.trim() === '') {
+          this.visibleTemplateNameError = 'Заполните имя шаблона';
+          return;
+        }
+        const order = this.getOrderModel();
+        const orderTemplate = {
+          order,
+          createDate: order.createDate,
+          bitrixCreatorID: order.bitrixCreatorID,
+          name: this.templateName,
+        };
+        api.post('/orderTemplate', orderTemplate).then((res) => {
+          console.log('resOrderTemplate', res);
+          this.$router.push({ path: '/templates' });
+        }).catch((err) => {
+          console.log('err', err);
+        });
+      } else {
+        this.visibleTemplateName = true;
+      }
     },
   },
   components: {
@@ -442,6 +474,15 @@ export default {
     }
     .description {
       width: 700px;
+    }
+    .template-danger {
+      border-color: red;
+    }
+    .template-danger-label {
+      color:red;
+      position:absolute;
+      top:-20px;
+      left:10px;
     }
 }
 </style>

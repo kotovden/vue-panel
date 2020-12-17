@@ -56,9 +56,11 @@
             <a-form-model-item label="Модификация вкладок:">
                 <a-input size="small" v-model="form.tabMode" />
             </a-form-model-item>
-            <a-form-model-item label="Терминал входит в состав шкафа:">
-                <a-switch size="small" v-model="form.isConsist" />
-            </a-form-model-item>
+            <a-switch size="small" v-model="form.isConsist" />
+            <label class="ant-form-item-label"
+                style="width: 272px;display:inline;padding-left:10px;color:rgba(0, 0, 0, 0.85);">
+                Терминал входит в состав шкафа:
+            </label>
         </a-form-model>
     </div>
 </template>
