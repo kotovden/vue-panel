@@ -1,17 +1,17 @@
 <template>
-  <div class="home">
-    <h1>Здравствуйте</h1>
+  <div class="module">
+    <h1>Модуль № {{ $route.params.id }}</h1>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Home',
+  name: 'EditModule',
 };
 </script>
 
 <style scoped lang="scss">
-.home {
+.module {
   text-align: left;
 }
 

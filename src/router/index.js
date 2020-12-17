@@ -11,6 +11,11 @@ const routes = [
     component: Home,
   },
   {
+    path: '/new-order',
+    name: 'NewOrder',
+    component: () => import(/* webpackChunkName: "about" */ '../views/NewOrder.vue'),
+  },
+  {
     path: '/templates',
     name: 'Templates',
     component: () => import(/* webpackChunkName: "about" */ '../views/Templates.vue'),
@@ -34,6 +39,26 @@ const routes = [
     path: '/edit-template/:id',
     name: 'EditTemplate',
     component: () => import(/* webpackChunkName: "about" */ '../views/EditTemplate.vue'),
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Admin.vue'),
+    children: [
+      {
+        path: '/admin/modules',
+        name: 'AdminModules',
+        component: () => import(/* webpackChunkName: "about" */ '../views/AdminModules.vue'),
+        children: [
+          {
+            path: '/admin/modules/:id',
+            name: 'EditModule',
+            component: () => import(/* webpackChunkName: "about" */ '../views/EditModule.vue'),
+          },
+        ],
+      },
+    ],
+
   },
 ];
 

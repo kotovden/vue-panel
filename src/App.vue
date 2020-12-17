@@ -1,11 +1,12 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Новая заявка</router-link>
+      <router-link to="/new-order">Новая заявка</router-link>
       <router-link to="/templates">Шаблоны</router-link>
       <router-link to="/orders-in-work">Заявки в работе</router-link>
       <router-link to="/orders-completed">Заявки изготовленные</router-link>
       <router-link to="/about">Отчет “Блоки в производстве”</router-link>
+      <router-link to="/admin/modules">Управление</router-link>
     </div>
     <router-view/>
   </div>
@@ -32,7 +33,7 @@
     color: #000000;
     padding: 10px 15px;
 
-    &.router-link-exact-active {
+    &.router-link-active {
       background-color: #f2f2f2;
     }
   }
