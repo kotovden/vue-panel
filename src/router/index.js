@@ -30,6 +30,11 @@ const routes = [
     name: 'EditOrder',
     component: () => import(/* webpackChunkName: "about" */ '../views/EditOrder.vue'),
   },
+  {
+    path: '/edit-template/:id',
+    name: 'EditTemplate',
+    component: () => import(/* webpackChunkName: "about" */ '../views/EditTemplate.vue'),
+  },
 ];
 
 const router = new VueRouter({

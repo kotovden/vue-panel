@@ -1,10 +1,10 @@
 <template>
   <div class="orders">
     <a-table :customRow="customRow" :columns="columns" :data-source="data">
-      <span slot="action">
+      <span slot="action" slot-scope="item">
         <div class="actions">
         <a>Задача</a>
-        <a v-if="type === 'active'">Отменить изготовление</a>
+        <a v-if="type === 'active'" @click="(e) => cancel(e, item.ID)">Отменить изготовление</a>
         </div>
       </span>
     </a-table>
@@ -62,6 +62,10 @@ export default {
     type: String,
   },
   methods: {
+    cancel(event, ID) {
+      event.stopPropagation();
+      this.$emit('cancel', ID);
+    },
     deleteRow(key) {
       this.$emit('deleteRow', key);
     },

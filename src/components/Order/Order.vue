@@ -69,11 +69,15 @@
       </p>
     </div>
     <div class="block-wrp">
+      <a-input style="width: 200px;"
+        size="large" v-model="templateName" placeholder="Имя шаблона" />
+              <a-button  style="margin-left: 10px;" size="large" @click="createOrderTemplate">
+          Сохранить как шаблон
+      </a-button>
+    </div>
+    <div class="block-wrp">
       <a-button size="large" type="primary" @click="createOrder">
           Создать заказ
-      </a-button>
-      <a-button disabled size="large" style="margin-left: 10px;">
-          Сохранить как шаблон
       </a-button>
     </div>
   </div>
@@ -132,13 +136,21 @@ export default {
         ],
       },
       note: '',
+      templateName: '',
     };
   },
   mounted() {
     const promiseModules = api.get('/modules');
     const promises = [promiseModules];
-    if (this.type === 'edit') {
-      promises.push(api.get(`/order?id=${this.$route.params.id}`));
+    switch (this.type) {
+      case 'edit':
+        promises.push(api.get(`/order?id=${this.$route.params.id}`));
+        break;
+      case 'edit-template':
+        promises.push(api.get(`/orderTemplate?id=${this.$route.params.id}`));
+        break;
+      default:
+        break;
     }
     Promise.all(promises).then((values) => {
       if (values && values.length) {
@@ -156,24 +168,20 @@ export default {
           const editRes = values[values.length - 1];
           if (editRes && editRes.data) {
             const { result } = editRes.data;
-            const order = result[0];
-            const resultOrder = {};
-            Object.keys(order).forEach((fieldName) => {
-              if (formFields.includes(fieldName)) {
-                resultOrder[fieldName] = result[0][fieldName];
-              }
-            });
-            if (order.form) {
-              const createDate = moment(order.createDate, null);
-              const deliveryDate = moment(order.form.deliveryDate, 'YYYY-MM-DD');
-              const checkDate = moment(order.form.checkDate, 'YYYY-MM-DD');
-              this.form = {
-                ...order.form, createDate, deliveryDate, checkDate,
-              };
-              this.analogBlocksOptions = { ...order.analogBlocksOptions };
-              this.terminalBlocksLocation = { ...order.terminalBlocksLocation };
-              this.options = { ...order.options };
-              this.note = order.note;
+            if (result) {
+              const order = result[0];
+              this.parseAndFillOrder(order);
+            }
+          }
+        }
+        if (this.type === 'edit-template') {
+          const editRes = values[values.length - 1];
+          console.log(editRes);
+          if (editRes && editRes.data) {
+            const { result } = editRes.data;
+            if (result) {
+              const orderTemplate = result[0];
+              this.parseAndFillOrderTemplate(orderTemplate);
             }
           }
         }
@@ -189,6 +197,31 @@ export default {
     type: String,
   },
   methods: {
+    parseAndFillOrder(order) {
+      const resultOrder = {};
+      Object.keys(order).forEach((fieldName) => {
+        if (formFields.includes(fieldName)) {
+          resultOrder[fieldName] = order[fieldName];
+        }
+      });
+      if (order.form) {
+        const createDate = moment(order.createDate, null);
+        const deliveryDate = moment(order.form.deliveryDate, 'YYYY-MM-DD');
+        const checkDate = moment(order.form.checkDate, 'YYYY-MM-DD');
+        this.form = {
+          ...order.form, createDate, deliveryDate, checkDate,
+        };
+        this.note = order.form.note;
+      }
+      this.analogBlocksOptions = { ...order.analogBlocksOptions };
+      this.terminalBlocksLocation = { ...order.terminalBlocksLocation };
+      this.options = { ...order.options };
+    },
+    parseAndFillOrderTemplate(orderTemplate) {
+      const order = { ...orderTemplate.order };
+      this.templateName = orderTemplate.name;
+      this.parseAndFillOrder(order);
+    },
     getModuleById(id) {
       return this.modulesBlocks.find((module) => module.ID === id);
     },
@@ -322,7 +355,7 @@ export default {
         this.modulesBlocks = modulesBlocks;
       }
     },
-    createOrder() {
+    getOrderModel() {
       const createDate = moment(new Date());
       const deliveryDate = moment(this.form.deliveryDate).format('YYYY-MM-DD');
       const checkDate = moment(this.form.checkDate).format('YYYY-MM-DD');
@@ -334,13 +367,13 @@ export default {
           deliveryDate,
           checkDate,
           count,
+          note: this.note,
         },
         createDate,
         isConsist: true,
         status: 'active',
         bitrixTaskID: 'string',
         bitrixCreatorID: 'string',
-        note: this.note,
         modules: [
           {
             moduleID: 0,
@@ -364,8 +397,25 @@ export default {
           rows: this.options.rows,
         },
       };
-      api.post('/order', newOrderData).then((res) => {
-        console.log('res', res);
+      return newOrderData;
+    },
+    createOrder() {
+      api.post('/order', this.getOrderModel()).then((res) => {
+        console.log('resOrder', res);
+      }).catch((err) => {
+        console.log('err', err);
+      });
+    },
+    createOrderTemplate() {
+      const order = this.getOrderModel();
+      const orderTemplate = {
+        order,
+        createDate: order.createDate,
+        bitrixCreatorID: order.bitrixCreatorID,
+        name: this.templateName,
+      };
+      api.post('/orderTemplate', orderTemplate).then((res) => {
+        console.log('resOrderTemplate', res);
       }).catch((err) => {
         console.log('err', err);
       });

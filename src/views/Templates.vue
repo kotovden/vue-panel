@@ -6,11 +6,11 @@
           item-layout="horizontal"
           :data-source="data"
           >
-          <a-list-item slot="renderItem" slot-scope="item">
-        <a slot="actions">Удалить</a>
-        <a-list-item-meta>
-          <a slot="title" href="#">{{ item.name }}</a>
-        </a-list-item-meta>
+        <a-list-item @click="() => clickItem(item)" slot="renderItem" slot-scope="item">
+          <a @click="(e) => handleDelete(e, item.ID)" slot="actions">Удалить</a>
+          <a-list-item-meta>
+            <a slot="title" href="#">{{ item.name }}</a>
+          </a-list-item-meta>
         </a-list-item>
         </a-list>
       </div>
@@ -18,345 +18,50 @@
 </template>
 
 <script>
+import api from '@/service/api';
+
 export default {
   name: 'Templates',
   data() {
     return {
       data: [
-        {
-          ID: 0,
-          name: 'Шаблон 1',
-          bitrixCreatorID: 'string',
-          createDate: '2020-12-10T17:51:14.729Z',
-          order: {
-            ID: 0,
-            title: 'string',
-            orderNumber: 'string',
-            deviceType: 'string',
-            deviceName: 'string',
-            count: 0,
-            checkDate: '2020-12-10',
-            deliveryDate: '2020-12-10',
-            workTemp: 'string',
-            auxiliaryVoltage: 'string',
-            discreteInputVoltage: 'string',
-            nameplateLabel: 'string',
-            terminalVendorCodes: [
-              'string',
-            ],
-            tabMode: 'string',
-            isConsist: true,
-            status: 'active',
-            bitrixTaskID: 'string',
-            bitrixCreatorID: 'string',
-            createDate: '2020-12-10T17:51:14.729Z',
-            modules: [
-              {
-                moduleID: 0,
-                moduleName: 'string',
-                rows: [
-                  {
-                    fieldID: 0,
-                    fieldName: 'string',
-                    value: 'string',
-                  },
-                ],
-              },
-            ],
-            analogBlocksOptions: {
-              headers: [
-                {
-                  label: 'string',
-                  colspan: 0,
-                },
-              ],
-              rows: [
-                [
-                  'string',
-                ],
-              ],
-            },
-            terminalBlocksLocation: {
-              headers: [
-                {
-                  label: 'string',
-                  colspan: 0,
-                },
-              ],
-              rows: [
-                [
-                  'string',
-                ],
-              ],
-            },
-            options: {
-              headers: [
-                {
-                  label: 'string',
-                  colspan: 0,
-                },
-              ],
-              rows: [
-                [
-                  'string',
-                ],
-              ],
-            },
-            note: 'string',
-          },
-        },
-        {
-          ID: 1,
-          name: 'Шаблон 2',
-          bitrixCreatorID: 'string',
-          createDate: '2020-12-10T17:51:14.729Z',
-          order: {
-            ID: 0,
-            title: 'string',
-            orderNumber: 'string',
-            deviceType: 'string',
-            deviceName: 'string',
-            count: 0,
-            checkDate: '2020-12-10',
-            deliveryDate: '2020-12-10',
-            workTemp: 'string',
-            auxiliaryVoltage: 'string',
-            discreteInputVoltage: 'string',
-            nameplateLabel: 'string',
-            terminalVendorCodes: [
-              'string',
-            ],
-            tabMode: 'string',
-            isConsist: true,
-            status: 'active',
-            bitrixTaskID: 'string',
-            bitrixCreatorID: 'string',
-            createDate: '2020-12-10T17:51:14.729Z',
-            modules: [
-              {
-                moduleID: 0,
-                moduleName: 'string',
-                rows: [
-                  {
-                    fieldID: 0,
-                    fieldName: 'string',
-                    value: 'string',
-                  },
-                ],
-              },
-            ],
-            analogBlocksOptions: {
-              headers: [
-                {
-                  label: 'string',
-                  colspan: 0,
-                },
-              ],
-              rows: [
-                [
-                  'string',
-                ],
-              ],
-            },
-            terminalBlocksLocation: {
-              headers: [
-                {
-                  label: 'string',
-                  colspan: 0,
-                },
-              ],
-              rows: [
-                [
-                  'string',
-                ],
-              ],
-            },
-            options: {
-              headers: [
-                {
-                  label: 'string',
-                  colspan: 0,
-                },
-              ],
-              rows: [
-                [
-                  'string',
-                ],
-              ],
-            },
-            note: 'string',
-          },
-        },
-        {
-          ID: 2,
-          name: 'Шаблон 3',
-          bitrixCreatorID: 'string',
-          createDate: '2020-12-10T17:51:14.729Z',
-          order: {
-            ID: 0,
-            title: 'string',
-            orderNumber: 'string',
-            deviceType: 'string',
-            deviceName: 'string',
-            count: 0,
-            checkDate: '2020-12-10',
-            deliveryDate: '2020-12-10',
-            workTemp: 'string',
-            auxiliaryVoltage: 'string',
-            discreteInputVoltage: 'string',
-            nameplateLabel: 'string',
-            terminalVendorCodes: [
-              'string',
-            ],
-            tabMode: 'string',
-            isConsist: true,
-            status: 'active',
-            bitrixTaskID: 'string',
-            bitrixCreatorID: 'string',
-            createDate: '2020-12-10T17:51:14.729Z',
-            modules: [
-              {
-                moduleID: 0,
-                moduleName: 'string',
-                rows: [
-                  {
-                    fieldID: 0,
-                    fieldName: 'string',
-                    value: 'string',
-                  },
-                ],
-              },
-            ],
-            analogBlocksOptions: {
-              headers: [
-                {
-                  label: 'string',
-                  colspan: 0,
-                },
-              ],
-              rows: [
-                [
-                  'string',
-                ],
-              ],
-            },
-            terminalBlocksLocation: {
-              headers: [
-                {
-                  label: 'string',
-                  colspan: 0,
-                },
-              ],
-              rows: [
-                [
-                  'string',
-                ],
-              ],
-            },
-            options: {
-              headers: [
-                {
-                  label: 'string',
-                  colspan: 0,
-                },
-              ],
-              rows: [
-                [
-                  'string',
-                ],
-              ],
-            },
-            note: 'string',
-          },
-        },
-        {
-          ID: 1,
-          name: 'Шаблон 4',
-          bitrixCreatorID: 'string',
-          createDate: '2020-12-10T17:51:14.729Z',
-          order: {
-            ID: 0,
-            title: 'string',
-            orderNumber: 'string',
-            deviceType: 'string',
-            deviceName: 'string',
-            count: 0,
-            checkDate: '2020-12-10',
-            deliveryDate: '2020-12-10',
-            workTemp: 'string',
-            auxiliaryVoltage: 'string',
-            discreteInputVoltage: 'string',
-            nameplateLabel: 'string',
-            terminalVendorCodes: [
-              'string',
-            ],
-            tabMode: 'string',
-            isConsist: true,
-            status: 'active',
-            bitrixTaskID: 'string',
-            bitrixCreatorID: 'string',
-            createDate: '2020-12-10T17:51:14.729Z',
-            modules: [
-              {
-                moduleID: 0,
-                moduleName: 'string',
-                rows: [
-                  {
-                    fieldID: 0,
-                    fieldName: 'string',
-                    value: 'string',
-                  },
-                ],
-              },
-            ],
-            analogBlocksOptions: {
-              headers: [
-                {
-                  label: 'string',
-                  colspan: 0,
-                },
-              ],
-              rows: [
-                [
-                  'string',
-                ],
-              ],
-            },
-            terminalBlocksLocation: {
-              headers: [
-                {
-                  label: 'string',
-                  colspan: 0,
-                },
-              ],
-              rows: [
-                [
-                  'string',
-                ],
-              ],
-            },
-            options: {
-              headers: [
-                {
-                  label: 'string',
-                  colspan: 0,
-                },
-              ],
-              rows: [
-                [
-                  'string',
-                ],
-              ],
-            },
-            note: 'string',
-          },
-        },
+
       ],
     };
+  },
+  mounted() {
+    api.get('/orderTemplate').then((res) => {
+      if (res && res.data) {
+        const { result } = res.data;
+        const currentResult = [];
+        result.forEach((orderTemplate) => {
+          currentResult.push({
+            key: orderTemplate.ID,
+            ID: orderTemplate.ID,
+            name: orderTemplate.name,
+          });
+        });
+        this.data = currentResult;
+      }
+    });
   },
   methods: {
     deleteRow(key) {
       this.$emit('deleteRow', key);
+    },
+    handleDelete(event, ID) {
+      event.stopPropagation();
+      api.delete(`/orderTemplate?id=${ID}`).then((res) => {
+        if (res && res.data && res.data.result === 'OK') {
+          this.data = this.data.filter((template) => template.ID !== ID);
+        }
+        console.log('deleteTemplate', res);
+      }).catch((err) => {
+        console.log('deleteTemplateErr', err);
+      });
+    },
+    clickItem(item) {
+      this.$router.push({ path: `/edit-template/${item.ID}` });
     },
   },
 };

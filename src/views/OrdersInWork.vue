@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <h1>В работе</h1>
-    <orders type="active" :data="data" />
+    <orders type="active" @cancel="cancel" :data="data" />
   </div>
 </template>
 
@@ -36,7 +36,21 @@ export default {
         });
         this.data = currentResult;
       }
+    }).catch((err) => {
+      console.log(err);
     });
+  },
+  methods: {
+    cancel(ID) {
+      api.put(`/order/cancel?id=${ID}`).then((res) => {
+        console.log(res);
+        if (res && res.data) {
+          this.data = this.data.filter((item) => item.ID !== ID);
+        }
+      }).catch((err) => {
+        console.log(err);
+      });
+    },
   },
   components: {
     Orders,
