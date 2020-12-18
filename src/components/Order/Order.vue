@@ -113,7 +113,7 @@ export default {
       form: {
         orderNumber: '',
         deviceType: '',
-        deviceName: 'none',
+        deviceName: '',
         count: undefined,
         checkDate: undefined,
         deliveryDate: undefined,

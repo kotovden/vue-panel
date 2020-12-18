@@ -12,6 +12,9 @@
             <a-form-model-item label="Тип устройства:">
                 <a-input size="small" v-model="form.deviceType" />
             </a-form-model-item>
+            <a-form-model-item label="Название устройства:">
+                <a-input size="small" v-model="form.deviceName" />
+            </a-form-model-item>
             <a-form-model-item label="Количество:">
                 <a-input size="small" v-model="form.count" />
             </a-form-model-item>
