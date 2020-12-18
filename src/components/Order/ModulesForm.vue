@@ -6,11 +6,11 @@
             v-for="col in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']"
             :slot="col" slot-scope="text, record, index">
               <a-form-item :key="col">
-                <a-input v-if="columns[col - 1].isEditable" :value="record[col]"
+                <a-input v-if="columns[col - 1] && columns[col - 1].isEditable" :value="record[col]"
                   @change="e => handleChange(e.target.value, record.key, index, col)"
                     size="large" placeholder="xxx/xxx" />
                 <a-select
-                v-if="!columns[col - 1].isEditable"
+                v-if="!columns[col - 1] || !columns[col - 1].isEditable"
                   show-search
                   option-filter-prop="children"
                   :filter-option="filterOption"
