@@ -10,6 +10,8 @@ import {
   Popconfirm,
   Form,
   List,
+  Icon,
+  Checkbox,
 } from 'ant-design-vue';
 import App from './App.vue';
 import router from './router';
@@ -31,6 +33,8 @@ Vue.use(Input.TextArea);
 Vue.use(List);
 Vue.use(List.Item);
 Vue.use(Select.Option);
+Vue.use(Icon);
+Vue.use(Checkbox);
 
 new Vue({
   router,
