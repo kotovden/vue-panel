@@ -3,11 +3,13 @@
     <h1>{{module && module.name}}</h1>
     <p>Модуль - блок таблица на форме.</p>
     <template>
-      <a-checkbox @change="(e) => onChangeCheckbox({allowNewLine: e.target.checked})">
+      <a-checkbox :checked="module.allowNewLine"
+        @change="(e) => onChangeCheckbox({allowNewLine: e.target.checked})">
         Добавление новых строк
       </a-checkbox>
       <br>
-      <a-checkbox @change="(e) => onChangeCheckbox({showComposition: e.target.checked})">
+      <a-checkbox :checked="module.showComposition"
+        @change="(e) => onChangeCheckbox({showComposition: e.target.checked})">
         Показывать состав модуля
       </a-checkbox>
       <br>
@@ -38,7 +40,10 @@ export default {
   computed: {
     module() {
       if (this && this.$attrs && this.$attrs.modules) {
-        return this.$attrs.modules.find((module) => +module.ID === +this.$route.params.id);
+        return {
+          ...this.$attrs.modules.find((module) => +module.ID === +this.$route.params.id),
+          ...this.currentModule,
+        };
       }
       return {};
     },

@@ -61,6 +61,8 @@ export default {
               ID: orderTemplate.ID,
               name: orderTemplate.name,
               position: orderTemplate.position,
+              allowNewLine: orderTemplate.allowNewLine,
+              showComposition: orderTemplate.showComposition,
             });
           });
           this.data = currentResult.sort((item1, item2) => item1.position - item2.position);
@@ -89,6 +91,7 @@ export default {
       event.stopPropagation();
       if (index > 0) {
         const prevPosition = this.data[index - 1] && this.data[index - 1].position;
+        console.log(index, index - 1, this.data[index - 1], this.data[index - 1].position);
         const data = [...this.data];
         data[index].position = prevPosition - 1;
         this.putModule(item.ID, data[index]);
