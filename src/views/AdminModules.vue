@@ -7,7 +7,7 @@
           {{module.name}}
         </router-link>
       </div>
-      <router-view :modules="data" />
+      <router-view />
       <list v-if="$route.name === 'AdminModules'"
         :needUpDownArrows="true"
         :data="data"
@@ -31,9 +31,7 @@ export default {
   name: 'Templates',
   data() {
     return {
-      data: [
-
-      ],
+      data: [],
     };
   },
   mounted() {

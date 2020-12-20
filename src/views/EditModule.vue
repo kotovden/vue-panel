@@ -1,23 +1,49 @@
 <template>
-  <div class="module">
-    <h1>{{module && module.name}}</h1>
+  <div class="module" v-if="currentModule.name">
+    <h1>{{currentModule && currentModule.name}}</h1>
     <p>Модуль - блок таблица на форме.</p>
     <template>
-      <a-checkbox :checked="module.allowNewLine"
+      <a-checkbox :checked="currentModule.allowNewLine"
         @change="(e) => onChangeCheckbox({allowNewLine: e.target.checked})">
         Добавление новых строк
       </a-checkbox>
       <br>
-      <a-checkbox :checked="module.showComposition"
+      <a-checkbox :checked="currentModule.showComposition"
         @change="(e) => onChangeCheckbox({showComposition: e.target.checked})">
         Показывать состав модуля
       </a-checkbox>
       <br>
       <list :data="fields"
+        :needUpDownArrows="true"
+        @up="up"
+        @down="down"
         @check="check"
         @handleEdit="handleEdit"
         @handleDelete="handleDelete"
         @createListItem="createField" />
+      <br>
+      <fields-table
+        title="Таблица значений"
+        :actions="{ copy: true, delete: true, save: true, }"
+        :columns="fieldsColumns"
+        :columnNames="fieldsColumnNames"
+        :data="possibleValuesData"
+        :compositionData="compositionData"
+        @handleChange="handleChangePossibleValues"
+        @saveRow="saveRowPossibleValues"
+        @deleteRow="deleteRowPossibleValues"
+        @copyRow="copyRowPossibleValues"
+        @addRow="addRowPossibleValues" />
+      <fields-table
+        title="Таблица Состава"
+        :actions="{ delete: true, save: true }"
+        :columns="compositionColumns"
+        :columnNames="compositionColumnNames"
+        :data="compositionData"
+        @handleChange="handleChangeComposition"
+        @saveRow="saveRowComposition"
+        @deleteRow="deleteRowComposition"
+        @addRow="addRowComposition" />
     </template>
   </div>
 </template>
@@ -25,50 +51,327 @@
 <script>
 import api from '@/service/api';
 import List from '../components/List.vue';
+import FieldsTable from '../components/FieldsTable.vue';
 
 export default {
-  components: { List },
+  components: { List, FieldsTable },
   name: 'EditModule',
   data() {
     return {
-      currentModule: {
-
-      },
+      currentModule: {},
       fields: [],
+      possibleValues: [],
+      compositionColumns: [
+        {
+          title: 'Наименование',
+          key: 'name',
+          dataIndex: 'name',
+          width: '200px',
+          scopedSlots: { customRender: 'name' },
+        },
+        {
+          title: 'Название для расчетов',
+          key: 'calcName',
+          dataIndex: 'calcName',
+          width: '200px',
+          scopedSlots: { customRender: 'calcName' },
+        },
+        {
+          title: 'Количество',
+          key: 'count',
+          dataIndex: 'count',
+          width: '120px',
+          scopedSlots: { customRender: 'count' },
+        },
+        {
+          title: 'Описание',
+          key: 'desc',
+          dataIndex: 'desc',
+          scopedSlots: { customRender: 'desc' },
+        },
+        {
+          title: 'Действия',
+          key: 'operations',
+          dataIndex: 'operations',
+          width: '120px',
+          scopedSlots: { customRender: 'operations' },
+        },
+      ],
+      compositionColumnNames: ['name', 'calcName', 'count', 'desc', 'sostav', 'operations'],
+      compositionData: [],
     };
   },
   computed: {
-    module() {
-      if (this && this.$attrs && this.$attrs.modules) {
-        return {
-          ...this.$attrs.modules.find((module) => +module.ID === +this.$route.params.id),
-          ...this.currentModule,
-        };
+    fieldsColumns() {
+      const columns = [
+        {
+          title: 'Состав',
+          key: 'sostav',
+          dataIndex: 'sostav',
+          scopedSlots: { customRender: 'sostav' },
+        },
+        {
+          title: 'Действия',
+          key: 'operations',
+          dataIndex: 'operations',
+          width: '160px',
+          scopedSlots: { customRender: 'operations' },
+        },
+      ];
+      if (this && this.fields && this.fields.length) {
+        return [...this.fields.map((item) => ({
+          title: item.name,
+          key: item.ID,
+          dataIndex: item.ID,
+          width: '200px',
+          scopedSlots: { customRender: `${item.ID}` },
+        })), ...columns];
       }
-      return {};
+      return [];
+    },
+    fieldsColumnNames() {
+      const columnNames = ['sostav', 'operations'];
+      if (this && this.fields && this.fields.length) {
+        return [...this.fields.map((item) => item.ID), ...columnNames];
+      }
+      return [...columnNames];
+    },
+    possibleValuesData() {
+      if (this.possibleValues && this.possibleValues.length) {
+        return this.possibleValues.map((possibleValuesItem, index) => {
+          const values = [...possibleValuesItem.values];
+          const rowItem = { key: index, needSave: possibleValuesItem.needSave };
+          values.forEach((element) => {
+            if (element.FieldID) {
+              rowItem[element.FieldID] = element.Value;
+            }
+          });
+          return rowItem;
+        });
+      }
+      return [];
     },
   },
   mounted() {
     this.loadFields(this.$route.params.id);
+    this.loadModule(this.$route.params.id);
+    this.loadPossibleValues(this.$route.params.id);
+    this.loadCompositions();
   },
   beforeRouteUpdate(to, from, next) {
+    this.currentModule = {};
+    this.fields = [];
     this.loadFields(to.params.id);
+    this.loadModule(to.params.id);
+    this.loadPossibleValues(to.params.id);
+    this.loadCompositions();
     next();
   },
   methods: {
+    loadModule(moduleId) {
+      api.get(`/modules?id=${moduleId}`).then((res) => {
+        if (res && res.data) {
+          this.currentModule = { ...res.data.result[0] };
+        }
+      }).catch((err) => { console.log(err); });
+    },
+    loadPossibleValues(moduleId) {
+      api.get(`/module/${moduleId}/possibleValues`).then((res) => {
+        if (res && res.data) {
+          console.log(res.data.result, 'possibleValues');
+          this.possibleValues = [...res.data.result];
+        }
+      }).catch((err) => { console.log(err); });
+    },
     loadFields(moduleId) {
       api.get(`/module/${moduleId}/fields`).then((res) => {
         if (res && res.data) {
-          this.fields = res.data.result;
+          this.fields = res.data.result.sort((item1, item2) => item1.position - item2.position);
         }
-      });
+      }).catch((err) => { console.log(err); });
+    },
+    loadCompositions() {
+      api.get('/composition').then((res) => {
+        if (res && res.data) {
+          console.log(res, 'composition');
+          const compositionDataNeedSave = [...this.compositionData].filter((item) => item.needSave);
+          this.compositionData = [...res.data.result, ...compositionDataNeedSave]
+            .map((item, index) => ({ needSave: false, ...item, key: index }));
+        }
+      }).catch((err) => { console.log(err); });
     },
     putField(ID, currentField) {
       return api.put(`/module/${this.$route.params.id}/fields?id=${ID}`, currentField).then((res) => {
         if (res && res.data) {
           this.loadFields(this.$route.params.id);
         }
+      }).catch((err) => { console.log(err); });
+    },
+    handleChangeComposition(compositions) {
+      this.compositionData = [...compositions];
+    },
+    handleChangePossibleValues(newPossibleValues, rowIndex, colIndex) {
+      const possibleValues = [...this.possibleValues];
+      if (possibleValues[rowIndex] && possibleValues[rowIndex].values) {
+        const values = [...possibleValues[rowIndex].values];
+        const currentValueIndex = values.findIndex((value) => value.FieldID === colIndex);
+        if (currentValueIndex >= 0) {
+          values[currentValueIndex].Value = newPossibleValues[rowIndex][colIndex];
+        } else {
+          values.push({
+            FieldID: colIndex,
+            ModuleID: this.$route.params.id,
+            Value: newPossibleValues[rowIndex][colIndex],
+          });
+        }
+        possibleValues[rowIndex].values = values;
+        possibleValues[rowIndex].needSave = true;
+        this.possibleValues = possibleValues;
+      }
+    },
+    deleteRowComposition(rowIndex) {
+      const composition = this.compositionData[rowIndex];
+      if (composition.ID) {
+        api.delete(`/composition?id=${composition.ID}`, composition).then((res) => {
+          if (res && res.data) {
+            this.compositionData.splice(rowIndex, 1);
+          }
+        })
+          .catch((err) => { console.log(err); });
+      } else {
+        this.compositionData.splice(rowIndex, 1);
+      }
+    },
+    saveRowComposition(rowIndex) {
+      const composition = {
+        ...this.compositionData[rowIndex],
+        count: +this.compositionData[rowIndex].count,
+      };
+      const compositionData = [...this.compositionData];
+
+      if (composition && composition.ID) {
+        api.put(`/composition?id=${composition.ID}`, composition).then((res) => {
+          if (res && res.data) {
+            compositionData[rowIndex] = {
+              ...compositionData[rowIndex],
+              ...res.data.result,
+              needSave: false,
+            };
+            this.compositionData = compositionData;
+          }
+        }).catch((err) => { console.log(err); });
+      } else {
+        api.post('composition', composition).then((res) => {
+          if (res && res.data) {
+            compositionData[rowIndex] = {
+              ...this.compositionData[rowIndex],
+              ...res.data.result,
+              needSave: false,
+            };
+            this.compositionData = compositionData;
+          }
+        }).catch((err) => { console.log(err); });
+      }
+    },
+    deleteRowPossibleValues(rowIndex) {
+      const possibleValue = this.possibleValues[rowIndex];
+      if (possibleValue.recordID) {
+        api.delete(`/module/${this.$route.params.id}/possibleValues?id=${possibleValue.recordID}`).then((res) => {
+          if (res && res.data) {
+            console.log(rowIndex, res);
+            this.possibleValues.splice(rowIndex, 1);
+          }
+        })
+          .catch((err) => { console.log(err); });
+      } else {
+        console.log(rowIndex);
+        this.possibleValues.splice(rowIndex, 1);
+      }
+    },
+    saveRowPossibleValues(rowIndex) {
+      const possibleValues = [...this.possibleValues];
+      const possibleValuesItem = {
+        ...possibleValues[rowIndex],
+        values: possibleValues[rowIndex].values
+          .map((item) => ({ ...item, ModuleID: +item.ModuleID })),
+      };
+      console.log(possibleValues, rowIndex);
+
+      if (possibleValuesItem && possibleValuesItem.recordID) {
+        api.put(`/module/${this.$route.params.id}/possibleValues`, possibleValuesItem).then((res) => {
+          if (res && res.data) {
+            possibleValues[rowIndex] = {
+              ...possibleValues[rowIndex],
+              ...res.data.result,
+              needSave: false,
+            };
+            this.possibleValues = possibleValues;
+          }
+        }).catch((err) => { console.log(err); });
+      } else {
+        api.post(`/module/${this.$route.params.id}/possibleValues`, possibleValuesItem).then((res) => {
+          if (res && res.data) {
+            possibleValues[rowIndex] = {
+              ...possibleValues[rowIndex],
+              ...res.data.result,
+              needSave: false,
+            };
+            this.possibleValues = possibleValues;
+          }
+        }).catch((err) => { console.log(err); });
+      }
+    },
+    addRowComposition() {
+      this.compositionData.push({
+        key: Math.max(this.compositionData.length,
+          +this.compositionData[this.compositionData.length - 1].key + 1),
+        name: '',
+        nameCalc: '',
+        count: '',
+        description: '',
+        needSave: true,
       });
+    },
+    addRowPossibleValues() {
+      const possibleValues = [...this.possibleValues];
+      const newPossibleValuesItem = { needSave: true };
+      newPossibleValuesItem.values = this.fields.map((item) => ({
+        FieldID: item.ID,
+        ModuleID: this.$route.params.id,
+        Value: '',
+      }));
+      possibleValues[this.possibleValues.length] = newPossibleValuesItem;
+      this.possibleValues = possibleValues;
+    },
+    copyRowPossibleValues(rowIndex) {
+      const possibleValues = [...this.possibleValues];
+      const fromPossibleValue = possibleValues[rowIndex];
+      const newPossibleValuesItem = { needSave: true };
+      newPossibleValuesItem.values = fromPossibleValue.values.map((item) => ({
+        FieldID: item.FieldID,
+        ModuleID: item.ModuleID,
+        Value: item.Value,
+      }));
+      possibleValues[this.possibleValues.length] = newPossibleValuesItem;
+      this.possibleValues = possibleValues;
+    },
+    up(event, item, index) {
+      event.stopPropagation();
+      if (index > 0) {
+        const prevPosition = this.fields[index - 1] && this.fields[index - 1].position;
+        const fields = [...this.fields];
+        fields[index].position = prevPosition - 1;
+        this.putField(item.ID, fields[index]);
+      }
+    },
+    down(event, item, index) {
+      event.stopPropagation();
+      if (index < this.fields.length - 1) {
+        const prevPosition = this.fields[index + 1] && this.fields[index + 1].position;
+        const fields = [...this.fields];
+        fields[index].position = prevPosition + 1;
+        this.putField(item.ID, fields[index]);
+      }
     },
     check(event, item, index) {
       const fields = [...this.fields];
@@ -105,13 +408,14 @@ export default {
       });
     },
     onChangeCheckbox(object) {
-      this.currentModule = { ...this.module, ...object };
+      this.currentModule = { ...this.currentModule, ...object };
       this.putModule(this.currentModule);
+      this.$emit('loadModules');
     },
     putModule(currentModule) {
       return api.put(`/modules?id=${this.$route.params.id}`, currentModule).then((res) => {
         if (res && res.data) {
-          this.currentModule = { ...res.data.result };
+          this.loadModule(this.$route.params.id);
         }
       }).catch((err) => {
         console.log(err);

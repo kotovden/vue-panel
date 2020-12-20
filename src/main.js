@@ -12,6 +12,7 @@ import {
   List,
   Icon,
   Checkbox,
+  Divider,
 } from 'ant-design-vue';
 import App from './App.vue';
 import router from './router';
@@ -35,6 +36,7 @@ Vue.use(List.Item);
 Vue.use(Select.Option);
 Vue.use(Icon);
 Vue.use(Checkbox);
+Vue.use(Divider);
 
 new Vue({
   router,

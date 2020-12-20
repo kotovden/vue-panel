@@ -1,7 +1,7 @@
 <template>
     <div class="list">
       <div class="wrapper">
-        <a-button  class="add-module"  @click="() => $emit('createListItem')">
+        <a-button type="primary" class="add-module"  @click="() => $emit('createListItem')">
             Добавить
         </a-button>
         <a-list
