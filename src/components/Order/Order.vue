@@ -12,6 +12,7 @@
         :module="module"
         :data="module.data"
         :columns="module.columns"
+        :columnNames="module.columnNames"
         @addRow="addRowModules"
         @changeModulesForm="changeModulesForm"
         @deleteRow="deleteRowModules" />
@@ -171,7 +172,6 @@ export default {
           moduleFieldsValues.forEach((res, index) => {
             this.parseModulesBlockColumns(res, index);
           });
-          console.log(moduleFieldsValues);
         }).catch((err) => {
           console.log(err);
         });
@@ -187,7 +187,6 @@ export default {
         }
         if (this.type === 'edit-template') {
           const editRes = values[values.length - 1];
-          console.log(editRes);
           if (editRes && editRes.data) {
             const { result } = editRes.data;
             if (result) {
@@ -346,7 +345,6 @@ export default {
         });
         this.modulesBlocks = modulesBlocks;
         modulesBlocks.forEach((item) => {
-          console.log(item);
           if (item && item.allowNewLine) {
             this.addRowModules(item.ID);
           }
@@ -355,20 +353,14 @@ export default {
     },
     parseModulesBlockColumns(res, resIndex) {
       if (res && res.data) {
-        const moduleColumns = res.data.result.sort((a, b) => a.ID - b.ID).map((item, index) => {
-          let width = null;
-          if (index === 0) {
-            width = 80;
-          }
-          return {
-            width,
+        const moduleColumns = res.data.result
+          .sort((a, b) => a.position - b.position).map((item) => ({
             title: item.name,
             key: item.ID,
             dataIndex: item.ID,
             scopedSlots: { customRender: `${item.ID}` },
             isEditable: !!item.isEditable,
-          };
-        });
+          }));
         moduleColumns.push({
           title: 'Действия',
           dataIndex: 'operation',
@@ -376,6 +368,7 @@ export default {
         });
         const modulesBlocks = [...this.modulesBlocks];
         modulesBlocks[resIndex].columns = moduleColumns;
+        modulesBlocks[resIndex].columnNames = moduleColumns.map((item) => item.dataIndex);
         this.modulesBlocks = modulesBlocks;
       }
     },
@@ -425,7 +418,6 @@ export default {
     },
     createOrder() {
       api.post('/order', this.getOrderModel()).then((res) => {
-        console.log('resOrder', res);
         this.$router.push({ path: '/orders-in-work' });
       }).catch((err) => {
         console.log('err', err);
@@ -445,7 +437,6 @@ export default {
           name: this.templateName,
         };
         api.post('/orderTemplate', orderTemplate).then((res) => {
-          console.log('resOrderTemplate', res);
           this.$router.push({ path: '/templates' });
         }).catch((err) => {
           console.log('err', err);

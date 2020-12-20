@@ -1,9 +1,9 @@
 <template>
     <div class="modules-form">
        <h3 v-if="module.name">{{module.name}}</h3>
-        <a-table :columns="columns" :data-source="data">
+        <a-table :pagination="false" :columns="columns" :data-source="data">
           <template
-            v-for="col in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']"
+            v-for="col in columnNames"
             :slot="col" slot-scope="text, record, index">
               <a-form-item :key="col">
                 <a-input v-if="columns[col - 1] && columns[col - 1].isEditable" :value="record[col]"
@@ -53,11 +53,11 @@ export default {
   props: {
     data: Array,
     columns: Array,
+    columnNames: Array,
     module: Object,
   },
   methods: {
     handleChange(value, key, index, col) {
-      console.log(value, key, col, index, this.data);
       const currentData = [...this.data];
       currentData[index][col] = value;
       this.$emit('changeModulesForm', currentData, this.module.ID);
