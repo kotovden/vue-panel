@@ -18,8 +18,7 @@ export default {
     };
   },
   mounted() {
-    api.get('/order?status=finished').then((res) => {
-      console.log(res);
+    api.get('/order?status=finished&limit=all').then((res) => {
       if (res && res.data) {
         const { result } = res.data;
         const currentResult = [];

@@ -5,7 +5,7 @@
       <router-link to="/templates">Шаблоны</router-link>
       <router-link to="/orders-in-work">Заявки в работе</router-link>
       <router-link to="/orders-completed">Заявки изготовленные</router-link>
-      <router-link to="/about">Отчет “Блоки в производстве”</router-link>
+      <router-link to="/report">Отчет “Блоки в производстве”</router-link>
       <router-link to="/admin/modules">Управление</router-link>
     </div>
     <router-view/>
@@ -32,6 +32,8 @@
   a {
     color: #000000;
     padding: 10px 15px;
+    margin: 0 0 10px 0;
+    display: inline-block;
 
     &.router-link-active {
       background-color: #f2f2f2;

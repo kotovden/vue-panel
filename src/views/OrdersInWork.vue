@@ -18,8 +18,7 @@ export default {
     };
   },
   mounted() {
-    api.get('/order?status=active').then((res) => {
-      console.log(res);
+    api.get('/order?status=active&limit=all').then((res) => {
       if (res && res.data) {
         const { result } = res.data;
         const currentResult = [];
@@ -43,7 +42,6 @@ export default {
   methods: {
     cancel(ID) {
       api.put(`/order/cancel?id=${ID}`).then((res) => {
-        console.log(res);
         if (res && res.data) {
           this.data = this.data.filter((item) => item.ID !== ID);
         }

@@ -30,7 +30,7 @@ export default {
     };
   },
   mounted() {
-    api.get('/orderTemplate').then((res) => {
+    api.get('/orderTemplate?limit=all').then((res) => {
       if (res && res.data) {
         const { result } = res.data;
         const currentResult = [];
@@ -55,9 +55,8 @@ export default {
         if (res && res.data && res.data.result === 'OK') {
           this.data = this.data.filter((template) => template.ID !== ID);
         }
-        console.log('deleteTemplate', res);
       }).catch((err) => {
-        console.log('deleteTemplateErr', err);
+        console.log(err);
       });
     },
     clickItem(item) {

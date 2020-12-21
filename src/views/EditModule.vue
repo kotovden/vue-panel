@@ -15,6 +15,8 @@
       <br>
       <list :data="fields"
         :needUpDownArrows="true"
+        :needCheckbox="true"
+        @handleChangeCheckbox="handleChangeCheckboxIsEditable"
         @up="up"
         @down="down"
         @check="check"
@@ -28,7 +30,7 @@
         :columns="fieldsColumns"
         :columnNames="fieldsColumnNames"
         :data="possibleValuesData"
-        :compositionData="compositionData"
+        :compositionData="compositionDataForFields"
         @handleChange="handleChangePossibleValues"
         @saveRow="saveRowPossibleValues"
         @deleteRow="deleteRowPossibleValues"
@@ -151,6 +153,9 @@ export default {
       }
       return [];
     },
+    compositionDataForFields() {
+      return this.compositionData.filter((item) => !!item.ID);
+    },
   },
   mounted() {
     this.loadFields(this.$route.params.id);
@@ -178,22 +183,20 @@ export default {
     loadPossibleValues(moduleId) {
       api.get(`/module/${moduleId}/possibleValues`).then((res) => {
         if (res && res.data) {
-          console.log(res.data.result, 'possibleValues');
           this.possibleValues = [...res.data.result];
         }
       }).catch((err) => { console.log(err); });
     },
     loadFields(moduleId) {
-      api.get(`/module/${moduleId}/fields`).then((res) => {
+      api.get(`/module/${moduleId}/fields?limit=all`).then((res) => {
         if (res && res.data) {
           this.fields = res.data.result.sort((item1, item2) => item1.position - item2.position);
         }
       }).catch((err) => { console.log(err); });
     },
     loadCompositions() {
-      api.get('/composition').then((res) => {
+      api.get(`/module/${this.$route.params.id}/composition`).then((res) => {
         if (res && res.data) {
-          console.log(res, 'composition');
           const compositionDataNeedSave = [...this.compositionData].filter((item) => item.needSave);
           this.compositionData = [...res.data.result, ...compositionDataNeedSave]
             .map((item, index) => ({ needSave: false, ...item, key: index }));
@@ -226,13 +229,14 @@ export default {
         }
         possibleValues[rowIndex].values = values;
         possibleValues[rowIndex].needSave = true;
+        possibleValues[rowIndex].compositions = newPossibleValues[rowIndex].compositions;
         this.possibleValues = possibleValues;
       }
     },
     deleteRowComposition(rowIndex) {
       const composition = this.compositionData[rowIndex];
       if (composition.ID) {
-        api.delete(`/composition?id=${composition.ID}`, composition).then((res) => {
+        api.delete(`/module/${this.$route.params.id}/composition?id=${composition.ID}`, composition).then((res) => {
           if (res && res.data) {
             this.compositionData.splice(rowIndex, 1);
           }
@@ -250,7 +254,7 @@ export default {
       const compositionData = [...this.compositionData];
 
       if (composition && composition.ID) {
-        api.put(`/composition?id=${composition.ID}`, composition).then((res) => {
+        api.put(`/module/${this.$route.params.id}/composition?id=${composition.ID}`, composition).then((res) => {
           if (res && res.data) {
             compositionData[rowIndex] = {
               ...compositionData[rowIndex],
@@ -261,7 +265,7 @@ export default {
           }
         }).catch((err) => { console.log(err); });
       } else {
-        api.post('composition', composition).then((res) => {
+        api.post(`/module/${this.$route.params.id}/composition`, composition).then((res) => {
           if (res && res.data) {
             compositionData[rowIndex] = {
               ...this.compositionData[rowIndex],
@@ -278,13 +282,11 @@ export default {
       if (possibleValue.recordID) {
         api.delete(`/module/${this.$route.params.id}/possibleValues?id=${possibleValue.recordID}`).then((res) => {
           if (res && res.data) {
-            console.log(rowIndex, res);
             this.possibleValues.splice(rowIndex, 1);
           }
         })
           .catch((err) => { console.log(err); });
       } else {
-        console.log(rowIndex);
         this.possibleValues.splice(rowIndex, 1);
       }
     },
@@ -295,7 +297,6 @@ export default {
         values: possibleValues[rowIndex].values
           .map((item) => ({ ...item, ModuleID: +item.ModuleID })),
       };
-      console.log(possibleValues, rowIndex);
 
       if (possibleValuesItem && possibleValuesItem.recordID) {
         api.put(`/module/${this.$route.params.id}/possibleValues`, possibleValuesItem).then((res) => {
@@ -322,9 +323,12 @@ export default {
       }
     },
     addRowComposition() {
+      let lastKey = 0;
+      if (this.compositionData[this.compositionData.length - 1]) {
+        lastKey = +this.compositionData[this.compositionData.length - 1].key + 1;
+      }
       this.compositionData.push({
-        key: Math.max(this.compositionData.length,
-          +this.compositionData[this.compositionData.length - 1].key + 1),
+        key: Math.max(this.compositionData.length, lastKey),
         name: '',
         nameCalc: '',
         count: '',
@@ -385,13 +389,22 @@ export default {
       fields[index].isEdit = true;
       this.fields = fields;
     },
+    handleChangeCheckboxIsEditable(checked, item, index) {
+      const fields = [...this.fields];
+      fields[index].isEditable = checked;
+      this.putField(item.ID, fields[index]).then((res) => {
+        if (res && res.data) {
+          this.fields = fields;
+        }
+      });
+    },
     handleDelete(event, ID) {
       api.delete(`/module/${this.$route.params.id}/fields?id=${ID}`).then((res) => {
         if (res && res.data && res.data.result === 'OK') {
           this.loadFields(this.$route.params.id);
         }
       }).catch((err) => {
-        console.log('deleteTemplateErr', err);
+        console.log(err);
       });
     },
     createField() {

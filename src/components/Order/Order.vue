@@ -152,7 +152,7 @@ export default {
     };
   },
   mounted() {
-    const promiseModules = api.get('/modules');
+    const promiseModules = api.get('/modules?limit=all');
     const promises = [promiseModules];
     switch (this.type) {
       case 'edit':
@@ -417,10 +417,10 @@ export default {
       return newOrderData;
     },
     createOrder() {
-      api.post('/order', this.getOrderModel()).then((res) => {
+      api.post('/order', this.getOrderModel()).then(() => {
         this.$router.push({ path: '/orders-in-work' });
       }).catch((err) => {
-        console.log('err', err);
+        console.log(err);
       });
     },
     createOrderTemplate() {
@@ -436,10 +436,10 @@ export default {
           bitrixCreatorID: order.bitrixCreatorID,
           name: this.templateName,
         };
-        api.post('/orderTemplate', orderTemplate).then((res) => {
+        api.post('/orderTemplate', orderTemplate).then(() => {
           this.$router.push({ path: '/templates' });
         }).catch((err) => {
-          console.log('err', err);
+          console.log(err);
         });
       } else {
         this.visibleTemplateName = true;

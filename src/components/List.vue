@@ -12,6 +12,12 @@
         <a-list-item
           @click="(e) => {$emit('clickItem', item, index)}"
             slot="renderItem" slot-scope="item, index">
+          <a-checkbox slot="actions" v-if="needCheckbox" :checked="item.isEditable"
+            @change="(e) => {
+              e.stopPropagation();
+              $emit('handleChangeCheckbox', e.target.checked, item, index);
+            }">
+          </a-checkbox>
           <a v-if="!item.isEdit"
             @click="(e) => {e.stopPropagation(); $emit('handleEdit', e, item, index)}"
             slot="actions"><a-icon type="edit" /></a>
@@ -52,6 +58,7 @@ export default {
   props: {
     data: Array,
     needUpDownArrows: Boolean,
+    needCheckbox: Boolean,
   },
 };
 </script>

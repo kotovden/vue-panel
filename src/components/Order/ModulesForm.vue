@@ -16,8 +16,6 @@
                   :filter-option="filterOption"
                   style="width: 100%"
                   size="large"
-                  @focus="handleFocus"
-                  @blur="handleBlur"
                   @change="value => handleChange(value, record.key, index, col)"
                 >
                   <a-select-option value="jack">
@@ -66,12 +64,6 @@ export default {
       return (
         option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
       );
-    },
-    handleBlur() {
-      console.log('blur');
-    },
-    handleFocus() {
-      console.log('focus');
     },
   },
 };

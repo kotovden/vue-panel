@@ -16,7 +16,6 @@
         @handleDelete="handleDelete"
         @up="up"
         @down="down"
-        @handleChange="handleChange"
         @createListItem="createModule"
         @clickItem="clickItem" />
     </div>
@@ -35,7 +34,6 @@ export default {
     };
   },
   mounted() {
-    console.log(this);
     this.loadModules();
   },
   methods: {
@@ -49,7 +47,7 @@ export default {
       });
     },
     loadModules() {
-      api.get('/modules').then((res) => {
+      api.get('/modules?limit=all').then((res) => {
         if (res && res.data) {
           const { result } = res.data;
           const currentResult = [];
@@ -67,9 +65,6 @@ export default {
         }
       });
     },
-    handleChange(event, item, index) {
-      console.log(item, index, this.data);
-    },
     check(event, item, index) {
       event.stopPropagation();
       const data = [...this.data];
@@ -83,18 +78,15 @@ export default {
       const data = [...this.data];
       data[index].isEdit = true;
       this.data = data;
-      console.log(event, item, index, this.data);
     },
     up(event, item, index) {
       event.stopPropagation();
       if (index > 0) {
         const prevPosition = this.data[index - 1] && this.data[index - 1].position;
-        console.log(index, index - 1, this.data[index - 1], this.data[index - 1].position);
         const data = [...this.data];
         data[index].position = prevPosition - 1;
         this.putModule(item.ID, data[index]);
       }
-      console.log(item, index, this.data);
     },
     down(event, item, index) {
       event.stopPropagation();
@@ -104,7 +96,6 @@ export default {
         data[index].position = prevPosition + 1;
         this.putModule(item.ID, data[index]);
       }
-      console.log(item, index, this.data);
     },
     createModule() {
       const newModule = {
@@ -127,9 +118,8 @@ export default {
         if (res && res.data && res.data.result === 'OK') {
           this.data = this.data.filter((template) => template.ID !== ID);
         }
-        console.log('deleteTemplate', res);
       }).catch((err) => {
-        console.log('deleteTemplateErr', err);
+        console.log(err);
       });
     },
     clickItem(item) {

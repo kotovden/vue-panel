@@ -65,7 +65,7 @@ export default {
     },
     handleChangeTags(value, index) {
       const currentData = [...this.data];
-      currentData[index].composition = value;
+      currentData[index].compositions = value;
       currentData[index].needSave = true;
       this.$emit('handleChange', currentData, index);
     },
