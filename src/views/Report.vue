@@ -17,7 +17,7 @@ export default {
     };
   },
   mounted() {
-    api.get('/report?limit-all').then((res) => {
+    api.get('/report?limit=all').then((res) => {
       if (res && res.data) {
         const result = { ...res.data.result };
         const columns = [{
