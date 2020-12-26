@@ -142,12 +142,17 @@ export default {
       if (this.possibleValues && this.possibleValues.length) {
         return this.possibleValues.map((possibleValuesItem, index) => {
           const values = [...possibleValuesItem.values];
+          let compositions = [];
+          if (possibleValuesItem && possibleValuesItem.compositions) {
+            compositions = [...possibleValuesItem.compositions];
+          }
           const rowItem = { key: index, needSave: possibleValuesItem.needSave };
           values.forEach((element) => {
-            if (element.FieldID) {
+            if (typeof (element.FieldID) !== 'undefined' && element.FieldID !== null) {
               rowItem[element.FieldID] = element.Value;
             }
           });
+          rowItem.sostav = compositions;
           return rowItem;
         });
       }
@@ -356,6 +361,7 @@ export default {
         ModuleID: item.ModuleID,
         Value: item.Value,
       }));
+      newPossibleValuesItem.compositions = [...fromPossibleValue.compositions];
       possibleValues[this.possibleValues.length] = newPossibleValuesItem;
       this.possibleValues = possibleValues;
     },

@@ -19,6 +19,7 @@
             <template slot="sostav" slot-scope="text, record, index">
               <a-select
                 mode="multiple"
+                :value="record.sostav"
                 size="large"
                 style="width: 100%"
                 @change="e => handleChangeTags(e, index)"
