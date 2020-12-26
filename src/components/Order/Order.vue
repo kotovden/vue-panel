@@ -345,9 +345,7 @@ export default {
         });
         this.modulesBlocks = modulesBlocks;
         modulesBlocks.forEach((item) => {
-          if (item && item.allowNewLine) {
-            this.addRowModules(item.ID);
-          }
+          this.addRowModules(item.ID);
         });
       }
     },
