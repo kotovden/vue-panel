@@ -6,11 +6,12 @@
             v-for="col in columnNames"
             :slot="col" slot-scope="text, record, index">
               <a-form-item :key="col">
-                <a-input v-if="columns[col - 1] && columns[col - 1].isEditable" :value="record[col]"
+                <a-input v-if="columnsMapByKey[col] && columnsMapByKey[col].isEditable"
+                  :value="record[col]"
                   @change="e => handleChange(e.target.value, record.key, index, col)"
                     size="large" placeholder="xxx/xxx" />
                 <a-select
-                v-if="!columns[col - 1] || !columns[col - 1].isEditable"
+                v-if="!columnsMapByKey[col] || !columnsMapByKey[col].isEditable"
                   show-search
                   option-filter-prop="children"
                   :filter-option="filterOption"
@@ -53,6 +54,17 @@ export default {
     columns: Array,
     columnNames: Array,
     module: Object,
+  },
+  computed: {
+    columnsMapByKey() {
+      const currentColumnsMapByKey = {};
+      if (this.columns && this.columns.length) {
+        this.columns.forEach((element) => {
+          currentColumnsMapByKey[element.key] = element;
+        });
+      }
+      return currentColumnsMapByKey;
+    },
   },
   methods: {
     handleChange(value, key, index, col) {
