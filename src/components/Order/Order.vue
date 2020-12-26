@@ -419,13 +419,13 @@ export default {
     createOrder() {
       if (this.type === 'create') {
         api.post('/order', this.getOrderModel()).then(() => {
-          this.$router.push({ path: '/orders-in-work' });
+          this.$router.push({ path: '/' });
         }).catch((err) => {
           console.log(err);
         });
       } else {
         api.put(`/order?id=${this.$route.params.id}`, this.getOrderModel()).then(() => {
-          this.$router.push({ path: '/orders-in-work' });
+          this.$router.push({ path: '/' });
         }).catch((err) => {
           console.log(err);
         });

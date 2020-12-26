@@ -134,6 +134,9 @@ export default {
 .modules {
   width: 100%;
   text-align: left;
+  .router-link-active {
+    background-color: #f2f2f2;
+  }
   .wrapper {
     width: 700px;
     border: 1px solid #ebedf0;

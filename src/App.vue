@@ -3,10 +3,10 @@
     <div id="nav">
       <router-link to="/new-order">Новая заявка</router-link>
       <router-link to="/templates">Шаблоны</router-link>
-      <router-link to="/orders-in-work">Заявки в работе</router-link>
+      <router-link to="/">Заявки в работе</router-link>
       <router-link to="/orders-completed">Заявки изготовленные</router-link>
       <router-link to="/report">Отчет “Блоки в производстве”</router-link>
-      <router-link to="/admin/modules">Управление</router-link>
+      <router-link class="modules-link" to="/admin/modules">Управление</router-link>
     </div>
     <router-view/>
   </div>
@@ -35,7 +35,10 @@
     margin: 0 0 10px 0;
     display: inline-block;
 
-    &.router-link-active {
+    &.router-link-exact-active {
+      background-color: #f2f2f2;
+    }
+    &.modules-link.router-link-active {
       background-color: #f2f2f2;
     }
   }

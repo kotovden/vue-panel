@@ -1,14 +1,14 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import Home from '../views/Home.vue';
+import OrdersInWork from '../views/OrdersInWork.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home,
+    name: 'OrdersInWork',
+    component: OrdersInWork,
   },
   {
     path: '/new-order',
@@ -19,11 +19,6 @@ const routes = [
     path: '/templates',
     name: 'Templates',
     component: () => import(/* webpackChunkName: "about" */ '../views/Templates.vue'),
-  },
-  {
-    path: '/orders-in-work',
-    name: 'OrdersInWork',
-    component: () => import(/* webpackChunkName: "about" */ '../views/OrdersInWork.vue'),
   },
   {
     path: '/orders-completed',
