@@ -24,8 +24,13 @@
           <a v-if="item.isEdit"
             @click="(e) => {e.stopPropagation(); $emit('check', e, item, index)}"
             slot="actions"><a-icon type="check" /></a>
-          <a @click="(e) => {e.stopPropagation(); $emit('handleDelete', e, item.ID)}"
-            slot="actions"><a-icon type="delete" /></a>
+          <a-popconfirm
+                  slot="actions"
+                  title="Вы уверены?"
+          @confirm="(e) => {e.stopPropagation(); $emit('handleDelete', e, item.ID)}"
+          >
+              <a href="javascript:;" ><a-icon type="delete" /></a>
+          </a-popconfirm>
           <a v-if="needUpDownArrows" class="arrow"
             @click="(e) => {e.stopPropagation();$emit('up', e, item, index)}">
             <a-icon type="arrow-up" />

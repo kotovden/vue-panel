@@ -7,7 +7,12 @@
           :data-source="data"
           >
         <a-list-item @click="() => clickItem(item)" slot="renderItem" slot-scope="item">
-          <a @click="(e) => handleDelete(e, item.ID)" slot="actions">Удалить</a>
+          <a-popconfirm
+                  title="Вы уверены?"
+          @confirm="(e) => handleDelete(e, item.ID)"
+          >
+              <a href="javascript:;" slot="actions">Удалить</a>
+          </a-popconfirm>
           <a-list-item-meta>
             <a slot="title" href="#">{{ item.name }}</a>
           </a-list-item-meta>

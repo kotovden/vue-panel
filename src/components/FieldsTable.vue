@@ -38,9 +38,16 @@
                     <a-icon type="cloud-upload" />
                   </a>
                   <a-divider if="actions.save" type="vertical" />
-                  <a v-if="actions.delete" @click="() => $emit('deleteRow', index)">
-                    <a-icon type="delete" />
-                  </a>
+                  <a-popconfirm
+                  slot="actions"
+                  v-if="actions.delete"
+                  title="Вы уверены?"
+                  @confirm="() => $emit('deleteRow', index)"
+                  >
+                    <a href="javascript:;">
+                      <a-icon type="delete" />
+                    </a>
+                  </a-popconfirm>
               </template>
           </a-table>
     </div>

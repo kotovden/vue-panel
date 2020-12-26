@@ -7,16 +7,28 @@
             class="add-col" type="primary" @click="() => $emit('add-col', type)">
               Добавить столбец
           </a-button>
-          <a-button v-if="rowsControls && rowIndex !== 0"
-            class="remove-row" type="danger" @click="() => $emit('remove-row', rowIndex, type)">
-              Удалить строку
-          </a-button>
+          <a-popconfirm
+                  v-if="rowsControls && rowIndex !== 0"
+                  title="Вы уверены?"
+          @confirm="() => $emit('remove-row', rowIndex, type)"
+          >
+              <a-button
+                class="remove-row" type="danger">
+                  Удалить строку
+              </a-button>
+          </a-popconfirm>
           <div
           :key="colIndex" v-for="(col, colIndex) in row">
-          <a-button v-if="colsControls && rowIndex === 0 && colIndex !== 0"
-            class="remove-col" type="danger" @click="() => $emit('remove-col', colIndex, type)">
-              Удалить столбец
-          </a-button>
+          <a-popconfirm
+                  v-if="colsControls && rowIndex === 0 && colIndex !== 0"
+                  title="Вы уверены?"
+          @confirm="() => $emit('remove-col', colIndex, type)"
+          >
+              <a-button
+                class="remove-col" type="danger">
+                  Удалить столбец
+              </a-button>
+          </a-popconfirm>
           <a-button v-if="rowsControls && rowIndex === data.length - 1 && colIndex === 0"
             class="add-row" type="primary" @click="() => $emit('add-row', type)">
               Добавить строку
