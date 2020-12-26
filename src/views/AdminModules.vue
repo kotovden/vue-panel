@@ -82,24 +82,42 @@ export default {
     up(event, item, index) {
       event.stopPropagation();
       if (index > 0) {
-        const prevPosition = this.data[index - 1] && this.data[index - 1].position;
-        const data = [...this.data];
-        data[index].position = prevPosition - 1;
-        this.putModule(item.ID, data[index]);
+        const prevIndex = index - 1;
+        const prevItem = this.data[prevIndex];
+        if (prevItem) {
+          const data = [...this.data];
+          const currentPosition = data[index].position;
+          const prevPosition = data[prevIndex].position;
+          data[prevIndex].position = currentPosition;
+          data[index].position = prevPosition;
+          this.putModule(item.ID, data[index]);
+          this.putModule(prevItem.ID, data[prevIndex]);
+        }
       }
     },
     down(event, item, index) {
       event.stopPropagation();
       if (index < this.data.length - 1) {
-        const prevPosition = this.data[index + 1] && this.data[index + 1].position;
-        const data = [...this.data];
-        data[index].position = prevPosition + 1;
-        this.putModule(item.ID, data[index]);
+        const nextIndex = index + 1;
+        const nextItem = this.data[nextIndex];
+        if (nextItem) {
+          const data = [...this.data];
+          const currentPosition = data[index].position;
+          const prevPosition = data[nextIndex].position;
+          data[nextIndex].position = currentPosition;
+          data[index].position = prevPosition;
+          this.putModule(item.ID, data[index]);
+          this.putModule(nextItem.ID, data[nextIndex]);
+        }
       }
     },
     createModule() {
+      let position = 0;
+      if (this.data && this.data.length && this.data[this.data.length - 1]) {
+        position = this.data[this.data.length - 1].position;
+      }
       const newModule = {
-        position: 0,
+        position: position + 1,
         name: 'Новый модуль',
         showComposition: false,
         allowNewLine: false,

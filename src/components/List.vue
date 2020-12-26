@@ -27,9 +27,9 @@
           <a-popconfirm
                   slot="actions"
                   title="Вы уверены?"
-          @confirm="(e) => {e.stopPropagation(); $emit('handleDelete', e, item.ID)}"
+              @confirm="(e) => {e.stopPropagation(); $emit('handleDelete', e, item.ID)}"
           >
-              <a href="javascript:;" ><a-icon type="delete" /></a>
+              <a @click="(e) => {e.stopPropagation();}" ><a-icon type="delete" /></a>
           </a-popconfirm>
           <a v-if="needUpDownArrows" class="arrow"
             @click="(e) => {e.stopPropagation();$emit('up', e, item, index)}">
@@ -49,6 +49,7 @@
           <a-list-item-meta>
             <a v-if="!item.isEdit" class="title" slot="title">
               {{ item.name }}
+              {{ item.position }}
             </a>
           </a-list-item-meta>
         </a-list-item>

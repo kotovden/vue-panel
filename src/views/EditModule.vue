@@ -368,19 +368,33 @@ export default {
     up(event, item, index) {
       event.stopPropagation();
       if (index > 0) {
-        const prevPosition = this.fields[index - 1] && this.fields[index - 1].position;
-        const fields = [...this.fields];
-        fields[index].position = prevPosition - 1;
-        this.putField(item.ID, fields[index]);
+        const prevIndex = index - 1;
+        const prevItem = this.fields[prevIndex];
+        if (prevItem) {
+          const fields = [...this.fields];
+          const currentPosition = fields[index].position;
+          const prevPosition = fields[prevIndex].position;
+          fields[prevIndex].position = currentPosition;
+          fields[index].position = prevPosition;
+          this.putField(item.ID, fields[index]);
+          this.putField(prevItem.ID, fields[prevIndex]);
+        }
       }
     },
     down(event, item, index) {
       event.stopPropagation();
       if (index < this.fields.length - 1) {
-        const prevPosition = this.fields[index + 1] && this.fields[index + 1].position;
-        const fields = [...this.fields];
-        fields[index].position = prevPosition + 1;
-        this.putField(item.ID, fields[index]);
+        const nextIndex = index + 1;
+        const nextItem = this.fields[nextIndex];
+        if (nextItem) {
+          const fields = [...this.fields];
+          const currentPosition = fields[index].position;
+          const prevPosition = fields[nextIndex].position;
+          fields[nextIndex].position = currentPosition;
+          fields[index].position = prevPosition;
+          this.putField(item.ID, fields[index]);
+          this.putField(nextItem.ID, fields[nextIndex]);
+        }
       }
     },
     check(event, item, index) {
@@ -414,7 +428,12 @@ export default {
       });
     },
     createField() {
+      let position = 0;
+      if (this.fields && this.fields.length && this.fields[this.fields.length - 1]) {
+        position = this.fields[this.fields.length - 1].position;
+      }
       const newField = {
+        position: position + 1,
         name: 'Новое свойство',
         isEditable: false,
       };
