@@ -166,7 +166,7 @@ export default {
     this.loadFields(this.$route.params.id);
     this.loadModule(this.$route.params.id);
     this.loadPossibleValues(this.$route.params.id);
-    this.loadCompositions();
+    this.loadCompositions(this.$route.params.id);
   },
   beforeRouteUpdate(to, from, next) {
     this.currentModule = {};
@@ -174,7 +174,7 @@ export default {
     this.loadFields(to.params.id);
     this.loadModule(to.params.id);
     this.loadPossibleValues(to.params.id);
-    this.loadCompositions();
+    this.loadCompositions(to.params.id);
     next();
   },
   methods: {
@@ -199,8 +199,8 @@ export default {
         }
       }).catch((err) => { console.log(err); });
     },
-    loadCompositions() {
-      api.get(`/module/${this.$route.params.id}/composition`).then((res) => {
+    loadCompositions(moduleId) {
+      api.get(`/module/${moduleId}/composition`).then((res) => {
         if (res && res.data) {
           const compositionDataNeedSave = [...this.compositionData].filter((item) => item.needSave);
           this.compositionData = [...res.data.result, ...compositionDataNeedSave]
