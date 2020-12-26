@@ -396,11 +396,13 @@ export default {
             moduleID: 0,
             moduleName: 'string',
             rows: [
-              {
-                fieldID: 0,
-                fieldName: 'string',
-                value: 'string',
-              },
+              [
+                {
+                  fieldID: 0,
+                  fieldName: 'string',
+                  value: 'string',
+                },
+              ],
             ],
           },
         ],

@@ -1,6 +1,9 @@
 <template>
   <div class="orders">
-    <a-table :customRow="customRow" :columns="columns" :data-source="data">
+    <a-table :pagination="pagination" :loading="loading"
+      @change="(pagination, filters, sorter) =>
+        $emit('handleTableChange', pagination, filters, sorter)"
+      :customRow="customRow" :columns="columns" :data-source="data">
       <span slot="action" slot-scope="item">
         <div class="actions">
         <a>Задача</a>
@@ -60,6 +63,8 @@ export default {
   props: {
     data: Array,
     type: String,
+    pagination: Object,
+    loading: Boolean,
   },
   methods: {
     cancel(event, ID) {
