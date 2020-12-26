@@ -71,7 +71,7 @@
     </div>
     <div class="block-wrp">
       <a-button size="large" type="primary" @click="createOrder">
-          Создать заказ
+          {{ this.type === 'create' ? 'Создать заказ' : 'Обновить заказ' }}
       </a-button>
     </div>
     <div style="display: flex;" class="block-wrp">
@@ -417,11 +417,19 @@ export default {
       return newOrderData;
     },
     createOrder() {
-      api.post('/order', this.getOrderModel()).then(() => {
-        this.$router.push({ path: '/orders-in-work' });
-      }).catch((err) => {
-        console.log(err);
-      });
+      if (this.type === 'create') {
+        api.post('/order', this.getOrderModel()).then(() => {
+          this.$router.push({ path: '/orders-in-work' });
+        }).catch((err) => {
+          console.log(err);
+        });
+      } else {
+        api.put(`/order?id=${this.$route.params.id}`, this.getOrderModel()).then(() => {
+          this.$router.push({ path: '/orders-in-work' });
+        }).catch((err) => {
+          console.log(err);
+        });
+      }
     },
     createOrderTemplate() {
       if (this.visibleTemplateName) {
