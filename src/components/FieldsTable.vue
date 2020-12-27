@@ -24,7 +24,8 @@
                 style="width: 100%"
                 @change="e => handleChangeTags(e, index)"
               >
-                <a-select-option v-for="composition in compositionData" :key="(composition.ID)">
+                <a-select-option :value="(composition.ID)"
+                v-for="composition in compositionData" :key="(composition.ID)">
                   {{ composition.name }}
                 </a-select-option>
               </a-select>
